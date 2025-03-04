@@ -33,7 +33,7 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
+        TextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
