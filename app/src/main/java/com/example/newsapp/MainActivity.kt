@@ -32,8 +32,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("splash_screen") { SplashScreen(navController) }
-                        composable("login_screen") { LoginScreen(navController) }
-                        composable("main_screen") { MainScreen(navController) }  // Ensure you have a MainScreen composable
+                        composable("main_screen") { LoginScreen(navController) }
                     }
                 }
             }
