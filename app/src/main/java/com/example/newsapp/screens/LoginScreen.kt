@@ -1,4 +1,4 @@
-package com.example.newsapp
+package com.example.newsapp.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.api_practice.R
 import com.example.newsapp.ui.theme.NewsAppTheme
 
 @Composable
@@ -68,7 +69,7 @@ fun LoginScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {}, modifier = Modifier.fillMaxWidth()) {
-            Image(painterResource(id = R.drawable.logo), contentDescription = "Google",modifier = Modifier.size(24.dp))
+            Image(painterResource(id = R.drawable.logo), contentDescription = "Google",modifier = Modifier.padding(4.dp).size(24.dp))
             Text("Login with google")
         }
     }
