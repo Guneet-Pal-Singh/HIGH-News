@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.newsapp.screens.LoginScreen
 import com.example.newsapp.screens.SplashScreen
+import com.example.newsapp.screens.HomeScreen
 import com.example.newsapp.ui.theme.NewsAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable("splash_screen") { SplashScreen(navController) }
                         composable("main_screen") { LoginScreen(navController) }
+                        composable("home_screen"){HomeScreen(navController)}
                     }
                 }
             }

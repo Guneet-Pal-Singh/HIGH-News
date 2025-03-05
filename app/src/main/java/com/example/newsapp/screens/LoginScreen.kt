@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.api_practice.R
+import com.example.newsapp.R
 import com.example.newsapp.ui.theme.NewsAppTheme
 
 @Composable
@@ -71,6 +71,10 @@ fun LoginScreen(navController: NavController) {
         Button(onClick = {}, modifier = Modifier.fillMaxWidth()) {
             Image(painterResource(id = R.drawable.logo), contentDescription = "Google",modifier = Modifier.padding(4.dp).size(24.dp))
             Text("Login with google")
+        }
+        
+        Button(onClick = {navController.navigate("home_screen")}) { 
+            Text("Go to Home Screen")
         }
     }
 }
