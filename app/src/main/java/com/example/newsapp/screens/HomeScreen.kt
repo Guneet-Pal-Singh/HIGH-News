@@ -1,5 +1,6 @@
 package com.example.newsapp.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,11 +33,20 @@ import com.example.newsapp.api.Article
 @Composable
 fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen=ViewModelHomeScreen()) {
     val newsResponse by viewModel.newsResponse.observeAsState()
-    Column(modifier = Modifier.fillMaxSize()){
-        LazyColumn(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.90f)) {items(newsResponse?.articles.orEmpty()){article->
-                ArticleCard(article)
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.90f)) {
+            newsResponse?.articles?.let { articles ->
+                items(articles) { article ->
+                    ArticleCard(article)
+                }
+            } ?: run {
+                item {
+                    Text("No articles available")
+                }
             }
         }
+
 
         Row(modifier = Modifier.fillMaxSize()) {
             Button(onClick = {}, modifier = Modifier.padding(3.dp)) {
@@ -55,10 +65,11 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen=View
 }
 
 @Composable
-fun ArticleCard(article: Article){
-    Card(modifier = Modifier.padding(8.dp)){
-        Column(modifier = Modifier.padding(8.dp)){
-            Row(modifier = Modifier.fillMaxWidth()){
+fun ArticleCard(article: Article) {
+    Log.d("ArticleCard", "Title: ${article.title}, Description: ${article.description}")
+    Card(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 AsyncImage(
                     model = article.urlToImage,
                     contentDescription = article.title,
@@ -66,14 +77,14 @@ fun ArticleCard(article: Article){
                 )
                 Column(modifier = Modifier.weight(1.0f)) {
                     Text(article.title, fontWeight = FontWeight.Bold, style = TextStyle(fontSize = 20.sp))
-                    Text(article.description)
+                    Text(article.description ?: "No description available")
                 }
             }
 
-            Row(modifier = Modifier){
-                Text(text=article.source.name)
+            Row(modifier = Modifier) {
+                Text(text = article.source.name)
                 Spacer(modifier = Modifier.padding(8.dp))
-                Text(text=article.publishedAt)
+                Text(text = article.publishedAt)
             }
         }
     }

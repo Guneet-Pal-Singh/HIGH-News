@@ -3,6 +3,7 @@ package com.example.newsapp
 import com.example.newsapp.api.APIInstance
 import com.example.newsapp.api.NewsResponse
 import android.util.Log
+import com.example.newsapp.constants.Constants
 import retrofit2.Response
 
 class NewsRepository {
@@ -12,7 +13,7 @@ class NewsRepository {
         suspend fun getTopHeadlines(): NewsResponse? {
             return try {
                 Log.d("NewsRepository", "Fetching top headlines...")
-                val response: Response<NewsResponse> = apiService.getTopHeadlines()
+                val response: Response<NewsResponse> = apiService.getTopHeadlines(countryCode = "us")
 
                 if (response.isSuccessful) {
                     Log.d("NewsRepository", "API success: ${response.body()}")
