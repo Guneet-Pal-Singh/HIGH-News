@@ -64,7 +64,7 @@ fun SearchBar(searchQuery: MutableState<String>) {
             Icon(
                 imageVector = Icons.Default.Menu,
                 contentDescription = "Menu Icon",
-                tint = Color.Black
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -80,7 +80,7 @@ fun SearchBar(searchQuery: MutableState<String>) {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = "Search Icon",
-                    tint = Color.Black
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             },
             colors = TextFieldDefaults.outlinedTextFieldColors()
@@ -93,7 +93,7 @@ fun SearchBar(searchQuery: MutableState<String>) {
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Profile Icon",
-                tint = Color.Black
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
     }
