@@ -8,7 +8,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/logo"
-        android:label="@string/app_name"
+        android:label="HIGH News"
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.NewsApp"
@@ -17,7 +17,7 @@
         <activity
             android:name="com.example.newsapp.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:label="HIGH News"
             android:theme="@style/Theme.NewsApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
