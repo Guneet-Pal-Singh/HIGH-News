@@ -32,7 +32,12 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
     val searchQuery = remember { mutableStateOf("") }
     val newsResponse by viewModel.newsResponse.observeAsState()
 
-    Column(modifier = Modifier.fillMaxSize().background(Color(0xFFECEFF1)).padding(8.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFECEFF1))
+            .padding(8.dp)
+    ) {
         SearchBar(searchQuery)
         NewsList(newsResponse?.articles)
     }
@@ -49,7 +54,7 @@ fun SearchBar(searchQuery: MutableState<String>) {
     ) {
         IconButton(
             onClick = { /* TODO: Open menu */ },
-            modifier = Modifier.padding(vertical = 5.dp) // Added padding
+            modifier = Modifier.padding(vertical = 5.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Menu,
@@ -77,9 +82,9 @@ fun SearchBar(searchQuery: MutableState<String>) {
         )
 
         IconButton(
-            onClick = { /* TODO: Open menu */ },
-            modifier = Modifier.padding(vertical = 5.dp) // Added padding
-        ){
+            onClick = { /* TODO: Open profile */ },
+            modifier = Modifier.padding(vertical = 5.dp)
+        ) {
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Profile Icon",
@@ -92,12 +97,20 @@ fun SearchBar(searchQuery: MutableState<String>) {
 @Composable
 fun NewsList(articles: List<Article>?) {
     LazyColumn(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
-        articles?.let {
-            items(it) { article ->
-                ArticleCard(article)
+        articles?.filter { !it.urlToImage.isNullOrEmpty() }?.let { filteredArticles ->
+            if (filteredArticles.isNotEmpty()) {
+                items(filteredArticles) { article ->
+                    ArticleCard(article)
+                }
+            } else {
+                item {
+                    Text(
+                        "No articles available",
+                        modifier = Modifier.padding(16.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
-        } ?: item {
-            Text("No articles available", modifier = Modifier.padding(16.dp), textAlign = TextAlign.Center)
         }
     }
 }
@@ -122,7 +135,7 @@ fun ArticleCard(article: Article) {
                     .fillMaxWidth()
                     .height(160.dp),
                 contentScale = ContentScale.Crop,
-                alignment = Alignment.TopCenter // Corrected alignment type
+                alignment = Alignment.TopCenter
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -147,7 +160,6 @@ fun ArticleCard(article: Article) {
         }
     }
 }
-
 
 fun String.toFormattedDate(): String {
     return try {
