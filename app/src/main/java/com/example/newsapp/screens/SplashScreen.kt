@@ -1,11 +1,11 @@
 package com.example.newsapp.screens
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
@@ -21,38 +21,45 @@ import androidx.navigation.NavController
 import com.example.newsapp.R
 import kotlinx.coroutines.delay
 
-//@Composable
 @Composable
 fun SplashScreen(navController: NavController) {
     var expandCircle by remember { mutableStateOf(false) }
+    var morphToRectangle by remember { mutableStateOf(false) }
 
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
 
-    // Get screen size in dp
+    // Compute screen diagonal for full coverage
     val screenWidthDp = configuration.screenWidthDp.dp
     val screenHeightDp = configuration.screenHeightDp.dp
-
-    // Convert to pixels for precise diagonal calculation
     val screenWidthPx = with(density) { screenWidthDp.toPx() }
     val screenHeightPx = with(density) { screenHeightDp.toPx() }
     val diagonalPx = kotlin.math.hypot(screenWidthPx, screenHeightPx)
     val diagonalDp = with(density) { diagonalPx.toDp() }
 
-    // Ensure complete coverage by making the circle significantly larger
-    val maxCircleSize = diagonalDp * 2f // Increased to 2x for full coverage
+    // Max circle size for full screen coverage
+    val maxCircleSize = remember { diagonalDp * 2f }
 
-    // Animate the circle expansion from 0.dp to the max computed size
+    // Animate circle expansion
     val circleSize by animateDpAsState(
-        targetValue = if (expandCircle) maxCircleSize else 0.dp, // Start from 0.dp
-        animationSpec = tween(durationMillis = 1200),
+        targetValue = if (expandCircle) maxCircleSize else 0.dp,
+        animationSpec = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
         label = "Circle Expansion"
     )
 
+    // Animate shape morphing from circle to rounded rectangle
+    val cornerRadius by animateDpAsState(
+        targetValue = if (morphToRectangle) 0.dp else 100.dp,
+        animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
+        label = "Shape Morphing"
+    )
+
     LaunchedEffect(Unit) {
-        delay(500) // Small delay before starting animation
+        delay(500)  // Initial delay before animation starts
         expandCircle = true
-        delay(1200) // Wait for animation completion
+        delay(150) // Wait for circle to fully expand
+        morphToRectangle = true
+        delay(800)  // Give time for the rectangle transition
         navController.navigate("main_screen") {
             popUpTo("splash_screen") { inclusive = true }
         }
@@ -66,15 +73,15 @@ fun SplashScreen(navController: NavController) {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            // Expanding circle that fully covers the screen
+            // Expanding & Morphing Shape
             Box(
                 modifier = Modifier
                     .size(circleSize)
-                    .clip(CircleShape)
+                    .clip(RoundedCornerShape(cornerRadius))
                     .background(MaterialTheme.colorScheme.primary)
             )
 
-            // Logo remains at a fixed size in the center
+            // Logo stays fixed at center
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "App Logo",
