@@ -1,6 +1,9 @@
 package com.example.newsapp.screens
 
+import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -115,12 +118,21 @@ fun NewsList(articles: List<Article>?) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ArticleCard(article: Article) {
     Card(
         modifier = Modifier
             .padding(5.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .combinedClickable (
+                onClick = {
+                    Log.e("Single Clicked","Single Clicked")
+                },
+                onDoubleClick= {
+                    Log.e("Double Clicked","Double Clicked")
+                }
+            ),
         shape = MaterialTheme.shapes.medium
     ) {
         Column(
