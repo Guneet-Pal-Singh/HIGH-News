@@ -35,7 +35,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFECEFF1))
+            .background(color = MaterialTheme.colorScheme.background)
             .padding(8.dp)
     ) {
         SearchBar(searchQuery)
@@ -125,7 +125,7 @@ fun ArticleCard(article: Article) {
     ) {
         Column(
             modifier = Modifier
-                .background(Color(0xFFFFE0B2))
+                .background(MaterialTheme.colorScheme.secondaryContainer)
                 .padding(10.dp)
         ) {
             AsyncImage(

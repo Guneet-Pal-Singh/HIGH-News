@@ -21,6 +21,7 @@ import androidx.navigation.NavController
 import com.example.newsapp.R
 import kotlinx.coroutines.delay
 
+//@Composable
 @Composable
 fun SplashScreen(navController: NavController) {
     var expandCircle by remember { mutableStateOf(false) }
@@ -28,25 +29,30 @@ fun SplashScreen(navController: NavController) {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
 
-    // Get screen width & height in dp
+    // Get screen size in dp
     val screenWidthDp = configuration.screenWidthDp.dp
     val screenHeightDp = configuration.screenHeightDp.dp
 
-    // Get the largest screen dimension and scale it up for full coverage
-    val maxDimension = maxOf(screenWidthDp, screenHeightDp)
-    val maxCircleSize = maxDimension * 2.5f // Ensures full expansion
+    // Convert to pixels for precise diagonal calculation
+    val screenWidthPx = with(density) { screenWidthDp.toPx() }
+    val screenHeightPx = with(density) { screenHeightDp.toPx() }
+    val diagonalPx = kotlin.math.hypot(screenWidthPx, screenHeightPx)
+    val diagonalDp = with(density) { diagonalPx.toDp() }
 
-    // Animate the circle expansion
+    // Ensure complete coverage by making the circle significantly larger
+    val maxCircleSize = diagonalDp * 2f // Increased to 2x for full coverage
+
+    // Animate the circle expansion from 0.dp to the max computed size
     val circleSize by animateDpAsState(
-        targetValue = if (expandCircle) maxCircleSize else 200.dp,
-        animationSpec = tween(durationMillis = 1000),
+        targetValue = if (expandCircle) maxCircleSize else 0.dp, // Start from 0.dp
+        animationSpec = tween(durationMillis = 1200),
         label = "Circle Expansion"
     )
 
     LaunchedEffect(Unit) {
-        delay(1500) // Delay before animation starts
+        delay(500) // Small delay before starting animation
         expandCircle = true
-        delay(1000) // Wait for animation to complete
+        delay(1200) // Wait for animation completion
         navController.navigate("main_screen") {
             popUpTo("splash_screen") { inclusive = true }
         }
@@ -65,10 +71,10 @@ fun SplashScreen(navController: NavController) {
                 modifier = Modifier
                     .size(circleSize)
                     .clip(CircleShape)
-                    .background(Color(0xFFFFF4CC)) // Soft pastel yellow
+                    .background(MaterialTheme.colorScheme.primary)
             )
 
-            // Fixed-size logo at 140.dp
+            // Logo remains at a fixed size in the center
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "App Logo",

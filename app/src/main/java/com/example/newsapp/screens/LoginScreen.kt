@@ -38,7 +38,7 @@ fun LoginScreen(navController: NavController) {
             modifier = Modifier
                 .size(circleSize)
                 .clip(CircleShape)
-                .background(Color(0xFFFFF4CC)) // Soft pastel yellow
+                .background(color = MaterialTheme.colorScheme.primary) // Soft pastel yellow
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo),
