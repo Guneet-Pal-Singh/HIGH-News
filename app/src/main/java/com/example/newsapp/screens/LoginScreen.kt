@@ -2,6 +2,7 @@ package com.example.newsapp.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -10,6 +11,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.newsapp.R
@@ -19,70 +22,101 @@ import com.example.newsapp.ui.theme.NewsAppTheme
 fun LoginScreen(navController: NavController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
-            .padding(16.dp)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(painter = painterResource(id = R.drawable.logo), contentDescription = "App Logo")
-
-        Spacer(modifier = Modifier.height(16.dp))
-        TextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("UserName") },
-            modifier = Modifier.fillMaxWidth()
+        Image(
+            painter = painterResource(id = R.drawable.logo),
+            contentDescription = "App Logo",
+            modifier = Modifier.size(120.dp)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        TextField(
+        Text(
+            text = "Welcome Back!",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Username") },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = {
-                // Handle login logic here
                 navController.navigate("main_screen") {
                     popUpTo("login_screen") { inclusive = true }
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            shape = RoundedCornerShape(12.dp)
         ) {
-            Text("Login")
+            Text("Login", fontSize = 16.sp)
         }
 
-        Button(onClick = {},
-            modifier = Modifier.fillMaxWidth()
+        Spacer(modifier = Modifier.height(12.dp))
+
+        TextButton(onClick = { /* Navigate to Sign Up */ }) {
+            Text("Don't have an account? Sign Up", color = MaterialTheme.colorScheme.primary)
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = { /* Google Login */ },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+            shape = RoundedCornerShape(12.dp),
+            elevation = ButtonDefaults.elevatedButtonElevation(4.dp)
         ) {
-            Text("Sign Up")
+            Image(
+                painter = painterResource(id = R.drawable.google),
+                contentDescription = "Google Icon",
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Login with Google", color = Color.Black)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = {}, modifier = Modifier.fillMaxWidth()) {
-            Image(painterResource(id = R.drawable.logo), contentDescription = "Google",modifier = Modifier.padding(4.dp).size(24.dp))
-            Text("Login with google")
-        }
-        
-        Button(onClick = {navController.navigate("home_screen")}) { 
-            Text("Go to Home Screen")
+        TextButton(onClick = { navController.navigate("home_screen") }) {
+            Text("Skip to Home", color = MaterialTheme.colorScheme.secondary)
         }
     }
 }
 
-
-@Composable
 @Preview(showBackground = true)
-
+@Composable
 fun PreviewLoginScreen() {
     NewsAppTheme {
         LoginScreen(navController = rememberNavController())
