@@ -67,4 +67,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("io.coil-kt:coil-compose:2.2.2")
     implementation("io.coil-kt:coil-svg:2.2.2")
+    implementation ("com.google.code.gson:gson:2.8.9")
+
 }

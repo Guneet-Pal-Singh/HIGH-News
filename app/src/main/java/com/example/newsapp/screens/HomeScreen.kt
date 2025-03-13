@@ -1,5 +1,6 @@
 package com.example.newsapp.screens
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.newsapp.api.Article
+import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -42,7 +44,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
             .padding(8.dp)
     ) {
         SearchBar(searchQuery)
-        NewsList(newsResponse?.articles)
+        NewsList(newsResponse?.articles , navController)
     }
 }
 
@@ -98,12 +100,12 @@ fun SearchBar(searchQuery: MutableState<String>) {
 }
 
 @Composable
-fun NewsList(articles: List<Article>?) {
+fun NewsList(articles: List<Article>? , navController: NavController) {
     LazyColumn(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
         articles?.filter { !it.urlToImage.isNullOrEmpty() }?.let { filteredArticles ->
             if (filteredArticles.isNotEmpty()) {
                 items(filteredArticles) { article ->
-                    ArticleCard(article)
+                    ArticleCard(article , navController)
                 }
             } else {
                 item {
@@ -120,17 +122,15 @@ fun NewsList(articles: List<Article>?) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ArticleCard(article: Article) {
+fun ArticleCard(article: Article, navController: NavController) {
     Card(
         modifier = Modifier
             .padding(5.dp)
             .fillMaxWidth()
             .combinedClickable (
                 onClick = {
-                    Log.e("Single Clicked","Single Clicked")
-                },
-                onDoubleClick= {
-                    Log.e("Double Clicked","Double Clicked")
+                    val json = Uri.encode(Gson().toJson(article))  // Convert Article to JSON string
+                    navController.navigate("news_detail/$json")
                 }
             ),
         shape = MaterialTheme.shapes.medium
@@ -155,18 +155,7 @@ fun ArticleCard(article: Article) {
             Text(
                 text = article.title,
                 fontWeight = FontWeight.Bold,
-                style = TextStyle(fontSize = 14.sp),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = article.publishedAt.toFormattedDate(),
-                fontWeight = FontWeight.Bold,
-                style = TextStyle(fontSize = 12.sp, color = Color.Gray),
-                textAlign = TextAlign.Center,
+                fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth()
             )
         }
