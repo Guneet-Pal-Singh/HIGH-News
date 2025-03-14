@@ -20,6 +20,7 @@ import com.example.newsapp.api.Article
 import com.example.newsapp.screens.LoginScreen
 import com.example.newsapp.screens.SplashScreen
 import com.example.newsapp.screens.HomeScreen
+import com.example.newsapp.screens.RegisterScreen
 import com.example.newsapp.screens.NewsDetailScreen
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.google.gson.Gson
@@ -41,6 +42,7 @@ class MainActivity : ComponentActivity() {
                         composable("main_screen") { LoginScreen(navController) }
                         composable("main_screen") { LoginScreen(navController) }
                         composable("home_screen"){HomeScreen(navController)}
+                        composable("register_screen") { RegisterScreen(navController) }
                         composable("news_detail/{article}") { backStackEntry ->
                             val json = backStackEntry.arguments?.getString("article")
                             val article = Gson().fromJson(json, Article::class.java)
