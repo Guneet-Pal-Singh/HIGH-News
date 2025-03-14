@@ -48,7 +48,7 @@ fun NewsDetailScreen(navController: NavController, article: Article) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = article.content,
+            text = article.content ?: "No content available",
             fontSize = 16.sp
         )
     }

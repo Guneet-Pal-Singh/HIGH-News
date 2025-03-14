@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable("splash_screen") { SplashScreen(navController) }
                         composable("main_screen") { LoginScreen(navController) }
+                        composable("main_screen") { LoginScreen(navController) }
                         composable("home_screen"){HomeScreen(navController)}
                         composable("news_detail/{article}") { backStackEntry ->
                             val json = backStackEntry.arguments?.getString("article")
