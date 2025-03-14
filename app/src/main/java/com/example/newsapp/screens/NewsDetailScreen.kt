@@ -15,20 +15,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.newsapp.api.Article
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun NewsDetailScreen(navController: NavController, article: Article) {
-    val url = article.url
-    AndroidView(
-        factory = { context ->
-            WebView(context).apply {
-                settings.javaScriptEnabled = true
-                webViewClient= WebViewClient()
-                loadUrl(url)
-            }
-        },
-        modifier = Modifier.fillMaxSize()
-    )
+fun NewsDetailScreen(navController: NavController) {
 }

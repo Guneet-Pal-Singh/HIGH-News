@@ -1,8 +1,7 @@
 package com.example.newsapp.screens
 
-import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -19,15 +18,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.newsapp.api.NewsResponse
+import com.example.newsapp.api.Result
 import coil.compose.AsyncImage
-import com.example.newsapp.api.Article
-import com.google.gson.Gson
+import com.example.newsapp.R
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -44,7 +46,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
             .padding(8.dp)
     ) {
         SearchBar(searchQuery)
-        NewsList(newsResponse?.articles , navController)
+        NewsList(newsResponse?.results , navController)
     }
 }
 
@@ -100,17 +102,17 @@ fun SearchBar(searchQuery: MutableState<String>) {
 }
 
 @Composable
-fun NewsList(articles: List<Article>? , navController: NavController) {
+fun NewsList(results: List<Result>?, navController: NavController) {
     LazyColumn(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
-        articles?.filter { !it.urlToImage.isNullOrEmpty() }?.let { filteredArticles ->
-            if (filteredArticles.isNotEmpty()) {
-                items(filteredArticles) { article ->
-                    ArticleCard(article , navController)
+        results?.filter { !it.image_url.isNullOrEmpty() }?.let { filteredresults ->
+            if (filteredresults.isNotEmpty()) {
+                items(filteredresults) { result ->
+                    ResultCard(result , navController)
                 }
             } else {
                 item {
                     Text(
-                        "No articles available",
+                        "No results available",
                         modifier = Modifier.padding(16.dp),
                         textAlign = TextAlign.Center
                     )
@@ -122,15 +124,14 @@ fun NewsList(articles: List<Article>? , navController: NavController) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ArticleCard(article: Article, navController: NavController) {
+fun ResultCard(result: Result, navController: NavController) {
     Card(
         modifier = Modifier
             .padding(5.dp)
             .fillMaxWidth()
-            .combinedClickable (
+            .combinedClickable(
                 onClick = {
-                    val json = Uri.encode(Gson().toJson(article))  // Convert Article to JSON string
-                    navController.navigate("news_detail/$json")
+                    // Handle click
                 }
             ),
         shape = MaterialTheme.shapes.medium
@@ -140,24 +141,58 @@ fun ArticleCard(article: Article, navController: NavController) {
                 .background(MaterialTheme.colorScheme.secondaryContainer)
                 .padding(10.dp)
         ) {
-            AsyncImage(
-                model = article.urlToImage,
-                contentDescription = article.title,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(160.dp),
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.TopCenter
-            )
+            // News Image
+            if (result.image_url != null){
+                AsyncImage(
+                    model = result.image_url,
+                    contentDescription = result.title,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp),
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.TopCenter
+                )
+            }else{
+                Image(
+                    painter = painterResource(id = R.drawable.no_image),
+                    contentDescription = "News Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            // Title
             Text(
-                text = article.title,
+                text = result.title,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            // Row for Date (Left) and Source (Right)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text =  result.pubDate,
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+
+                Text(
+                    text = result.source_name,
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                    textAlign = TextAlign.End
+                )
+            }
         }
     }
 }
@@ -171,4 +206,18 @@ fun String.toFormattedDate(): String {
     } catch (e: Exception) {
         this
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    ResultCard(result = Result("abc","abc"
+        ,"abc","abc",
+        listOf("abc"),"abc",listOf("abc"),
+        "abc","abc",false,
+        "abc","abc","abc",
+        "abc","abc","abc",
+        "abc","abc","abc",
+        "abc","abc",0,
+        "abc","abc","abc",),navController = NavController(LocalContext.current))
 }

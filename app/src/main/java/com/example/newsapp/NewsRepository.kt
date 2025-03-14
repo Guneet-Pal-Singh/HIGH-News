@@ -13,7 +13,7 @@ class NewsRepository {
         suspend fun getTopHeadlines(): NewsResponse? {
             return try {
                 Log.d("NewsRepository", "Fetching top headlines...")
-                val response: Response<NewsResponse> = apiService.getTopHeadlines(countryCode = "us")
+                val response: Response<NewsResponse> = apiService.getTopHeadlines(language = "en")
 
                 if (response.isSuccessful) {
                     Log.d("NewsRepository", "API success: ${response.body()}")
