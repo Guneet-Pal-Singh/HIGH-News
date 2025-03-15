@@ -153,7 +153,7 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
                     Toast.makeText(context, "Bookmarked!", Toast.LENGTH_SHORT).show()
                 },
                 modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Icon(
                     imageVector = Icons.Filled.Bookmark,

@@ -3,11 +3,13 @@ package com.example.newsapp.screens
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
@@ -39,6 +41,9 @@ import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.SportsSoccer
 import androidx.compose.material.icons.filled.Computer
+import androidx.compose.ui.res.painterResource
+import com.example.newsapp.R
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = ViewModelHomeScreen()) {
@@ -63,23 +68,66 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
+                // **App Logo and Name**
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape)
+                            .background(color = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo),
+                            contentDescription = "App Logo",
+                            modifier = Modifier
+                                .size(90.dp)
+                                .align(Alignment.Center)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "HIGH News",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "Get HIGH on information",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+                // **Categories Section**
                 Text(
                     text = "Categories",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(16.dp)
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 20.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(8.dp)
                 )
+
                 categories.forEach { category ->
                     NavigationDrawerItem(
                         label = { Text(text = category) },
-                        icon = { Icon(imageVector = categoryIcons[category] ?: Icons.Default.Public, contentDescription = category) },
+                        icon = {
+                            Icon(
+                                imageVector = categoryIcons[category] ?: Icons.Default.Public,
+                                contentDescription = category
+                            )
+                        },
                         selected = selectedCategory.value == category,
                         onClick = {
                             selectedCategory.value = category
                             coroutineScope.launch { drawerState.close() }
                             viewModel.fetchTopHeadlines(category.lowercase()) // Trigger API call
                         },
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(4.dp)
                     )
                 }
             }
@@ -93,7 +141,8 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
         ) {
             SearchBar(
                 searchQuery = searchQuery,
-                onMenuClick = { coroutineScope.launch { drawerState.open() } } // Open drawer
+                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                navController = navController // Pass the actual NavController
             )
             NewsList(newsResponse?.articles, navController)
         }
@@ -103,7 +152,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(searchQuery: MutableState<String>, onMenuClick: () -> Unit) {
+fun SearchBar(searchQuery: MutableState<String>, onMenuClick: () -> Unit , navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -140,7 +189,7 @@ fun SearchBar(searchQuery: MutableState<String>, onMenuClick: () -> Unit) {
         )
 
         IconButton(
-            onClick = { /* TODO: Open profile */ },
+            onClick = { navController.navigate("profile_screen") }, // Navigate to Profile Screen
             modifier = Modifier.padding(vertical = 5.dp)
         ) {
             Icon(
