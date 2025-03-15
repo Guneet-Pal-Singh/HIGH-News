@@ -12,17 +12,17 @@ import kotlinx.coroutines.launch
 class ViewModelHomeScreen : ViewModel() {
     private val _newsResponse = MutableLiveData<NewsResponse?>()
     val newsResponse: LiveData<NewsResponse?> = _newsResponse
-    private var cnt=0;
+
     init {
-        fetchTopHeadlines()
+        fetchTopHeadlines("general") // Default category
     }
 
-    fun fetchTopHeadlines() {
+    fun fetchTopHeadlines(category: String) {
         viewModelScope.launch {
-            Log.d("ViewModelHomeScreen", "Fetching news from repository...")
-            Log.d("Count", "Count: ${cnt++}")
+            Log.d("ViewModelHomeScreen", "Fetching $category news from repository...")
+
             try {
-                val response: NewsResponse? = NewsRepository.getTopHeadlines()
+                val response: NewsResponse? = NewsRepository.getTopHeadlines(category)
                 _newsResponse.value = response
 
                 if (response != null) {

@@ -28,6 +28,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.newsapp.api.Article
 import com.google.gson.Gson
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -36,21 +37,55 @@ import java.util.*
 fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = ViewModelHomeScreen()) {
     val searchQuery = remember { mutableStateOf("") }
     val newsResponse by viewModel.newsResponse.observeAsState()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val coroutineScope = rememberCoroutineScope()
+    val categories = listOf("General", "Business", "Health", "Entertainment", "Science", "Sports", "Technology")
+    val selectedCategory = remember { mutableStateOf("General") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background)
-            .padding(8.dp)
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                Text(
+                    text = "Categories",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(16.dp)
+                )
+                categories.forEach { category ->
+                    NavigationDrawerItem(
+                        label = { Text(text = category) },
+                        selected = selectedCategory.value == category,
+                        onClick = {
+                            selectedCategory.value = category
+                            coroutineScope.launch { drawerState.close() }
+                            viewModel.fetchTopHeadlines(category.lowercase()) // Trigger API call
+                        },
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
+        }
     ) {
-        SearchBar(searchQuery)
-        NewsList(newsResponse?.articles , navController)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.background)
+                .padding(8.dp)
+        ) {
+            SearchBar(
+                searchQuery = searchQuery,
+                onMenuClick = { coroutineScope.launch { drawerState.open() } } // Open drawer
+            )
+            NewsList(newsResponse?.articles, navController)
+        }
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(searchQuery: MutableState<String>) {
+fun SearchBar(searchQuery: MutableState<String>, onMenuClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -58,7 +93,7 @@ fun SearchBar(searchQuery: MutableState<String>) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         IconButton(
-            onClick = { /* TODO: Open menu */ },
+            onClick = { onMenuClick() }, // Open sidebar
             modifier = Modifier.padding(vertical = 5.dp)
         ) {
             Icon(
@@ -98,6 +133,7 @@ fun SearchBar(searchQuery: MutableState<String>) {
         }
     }
 }
+
 
 @Composable
 fun NewsList(articles: List<Article>? , navController: NavController) {

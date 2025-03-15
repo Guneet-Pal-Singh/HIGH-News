@@ -10,10 +10,13 @@ class NewsRepository {
     companion object {
         private val apiService by lazy { APIInstance.api }
 
-        suspend fun getTopHeadlines(): NewsResponse? {
+        suspend fun getTopHeadlines(category: String = "general"): NewsResponse? {
             return try {
-                Log.d("NewsRepository", "Fetching top headlines...")
-                val response: Response<NewsResponse> = apiService.getTopHeadlines(countryCode = "us")
+                Log.d("NewsRepository", "Fetching top headlines for category: $category")
+                val response: Response<NewsResponse> = apiService.getTopHeadlines(
+                    countryCode = "us",
+                    category = category
+                )
 
                 if (response.isSuccessful) {
                     Log.d("NewsRepository", "API success: ${response.body()}")
@@ -23,7 +26,7 @@ class NewsRepository {
                     null
                 }
             } catch (e: Exception) {
-                Log.e("NewsRepository", "Exception: ${e}")
+                Log.e("NewsRepository", "Exception: ${e.localizedMessage}")
                 null
             }
         }
