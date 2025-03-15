@@ -123,18 +123,15 @@ fun NewsList(articles: List<Article>? , navController: NavController) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ArticleCard(article: Article, navController: NavController) {
-    var expanded by remember { mutableStateOf(false) } // State to control the dropdown menu
-
     Card(
         modifier = Modifier
             .padding(5.dp)
             .fillMaxWidth()
-            .combinedClickable(
+            .combinedClickable (
                 onClick = {
-                    val json = Uri.encode(Gson().toJson(article)) // Convert Article to JSON string
+                    val json = Uri.encode(Gson().toJson(article))  // Convert Article to JSON string
                     navController.navigate("news_detail/$json")
-                },
-                onLongClick = { expanded = true } // Show the dropdown on long press
+                }
             ),
         shape = MaterialTheme.shapes.medium
     ) {
@@ -162,27 +159,8 @@ fun ArticleCard(article: Article, navController: NavController) {
                 modifier = Modifier.fillMaxWidth()
             )
         }
-
-        // Dropdown menu for bookmark option
-        Box(modifier = Modifier.fillMaxSize()) {
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-            ) {
-                DropdownMenuItem(
-                    text = { Text("Bookmark") },
-                    onClick = {
-                        expanded = false
-                        // Handle bookmarking logic here
-                        Log.d("Bookmark", "Article bookmarked: ${article.title}")
-                    }
-                )
-            }
-        }
     }
 }
-
 
 fun String.toFormattedDate(): String {
     return try {

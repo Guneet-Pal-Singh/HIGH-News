@@ -1,24 +1,30 @@
 package com.example.newsapp.screens
 
 import android.annotation.SuppressLint
+import android.icu.text.SimpleDateFormat
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.newsapp.api.Article
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.Image
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
+import java.util.*
+import java.util.TimeZone.getTimeZone
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -46,6 +52,17 @@ fun WebViewScreen(url: String) {
     )
 }
 
+fun formatIndianTime(dateString: String): String {
+    return try {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+        val date = inputFormat.parse(dateString)
+        val outputFormat = SimpleDateFormat("dd MMMM yyyy", Locale("en", "IN"))
+        outputFormat.format(date ?: Date())
+    } catch (e: Exception) {
+        dateString
+    }
+}
+
 @Composable
 fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
     Column(
@@ -56,18 +73,32 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
     ) {
         Text(
             text = article.title,
-            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
+            style = TextStyle(
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Serif
+            ),
             textAlign = TextAlign.Start,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        // Image inside a Card with rounded corners
+        Text(
+            text = "Source - ${article.source.name} | ${formatIndianTime(article.publishedAt)}",
+            style = TextStyle(
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                fontFamily = FontFamily.SansSerif
+            ),
+            textAlign = TextAlign.Start,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
         Card(
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(350.dp)
-                .padding(bottom = 18.dp, top = 18.dp)
+                .height(300.dp)
+                .padding(bottom = 18.dp, top = 12.dp)
         ) {
             Image(
                 painter = rememberAsyncImagePainter(article.urlToImage),
@@ -79,12 +110,28 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
 
         Text(
             text = article.description,
-            style = MaterialTheme.typography.headlineSmall,
+            style = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                fontFamily = FontFamily.Serif
+            ),
             textAlign = TextAlign.Start,
+            modifier = Modifier.padding(bottom = 10.dp)
+        )
+
+        Text(
+            text = article.content.replace(Regex("\\[\\+\\d+ chars]"), "") +
+                    "\n\nTo read the full article, click on the 'Read More' button below.",
+            style = TextStyle( // Applying the same style as description
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                fontFamily = FontFamily.Serif
+            ),
+            textAlign = TextAlign.Start, // Same alignment as description
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        Spacer(Modifier.weight(1f)) // Push buttons to bottom
+        Spacer(Modifier.weight(1f))
 
         Row(
             modifier = Modifier
@@ -97,7 +144,7 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
-                Text("Save", style = MaterialTheme.typography.labelLarge)
+                Text("Save", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
             }
 
             Spacer(Modifier.width(8.dp))
@@ -107,7 +154,7 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Read More", style = MaterialTheme.typography.labelLarge)
+                Text("Read More", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
             }
         }
     }
