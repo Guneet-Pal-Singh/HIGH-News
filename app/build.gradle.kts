@@ -68,5 +68,6 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.2.2")
     implementation("io.coil-kt:coil-svg:2.2.2")
     implementation ("com.google.code.gson:gson:2.8.9")
+    implementation("androidx.compose.material:material-icons-extended:1.5.0")
 
 }

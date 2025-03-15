@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -24,7 +26,9 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.newsapp.api.Article
 import java.util.*
-import java.util.TimeZone.getTimeZone
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.ui.platform.LocalContext
+
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -141,12 +145,25 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
                 .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
+            val context = LocalContext.current  // Get the context
+
             Button(
-                onClick = { /* Handle save */ },
+                onClick = {
+                    Toast.makeText(context, "Bookmarked!", Toast.LENGTH_SHORT).show()
+                },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
-                Text("Save", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold))
+                Icon(
+                    imageVector = Icons.Filled.Bookmark,
+                    contentDescription = "Bookmark",
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "Bookmark",
+                    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                )
             }
 
             Spacer(Modifier.width(8.dp))
