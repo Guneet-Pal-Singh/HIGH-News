@@ -32,7 +32,13 @@ import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
-
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.SportsSoccer
+import androidx.compose.material.icons.filled.Computer
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = ViewModelHomeScreen()) {
@@ -42,6 +48,16 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
     val coroutineScope = rememberCoroutineScope()
     val categories = listOf("General", "Business", "Health", "Entertainment", "Science", "Sports", "Technology")
     val selectedCategory = remember { mutableStateOf("General") }
+
+    val categoryIcons = mapOf(
+        "General" to Icons.Default.Public,
+        "Business" to Icons.Default.Business,
+        "Health" to Icons.Default.LocalHospital,
+        "Entertainment" to Icons.Default.Movie,
+        "Science" to Icons.Default.Science,
+        "Sports" to Icons.Default.SportsSoccer,
+        "Technology" to Icons.Default.Computer
+    )
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -56,6 +72,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
                 categories.forEach { category ->
                     NavigationDrawerItem(
                         label = { Text(text = category) },
+                        icon = { Icon(imageVector = categoryIcons[category] ?: Icons.Default.Public, contentDescription = category) },
                         selected = selectedCategory.value == category,
                         onClick = {
                             selectedCategory.value = category

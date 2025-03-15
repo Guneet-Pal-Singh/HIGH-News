@@ -126,7 +126,8 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
         )
 
         Text(
-            text = article.content.replace(Regex("\\[\\+\\d+ chars]"), "") +
+            text = (article.content ?: "Content unavailable")
+                .replace(Regex("\\[\\+\\d+ chars]"), "") +
                     "\n\nTo read the full article, click on the 'Read More' button below.",
             style = TextStyle(
                 fontSize = 18.sp,
