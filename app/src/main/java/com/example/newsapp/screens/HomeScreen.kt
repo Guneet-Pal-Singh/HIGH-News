@@ -228,44 +228,68 @@ fun NewsList(articles: List<Article>? , navController: NavController) {
 fun ArticleCard(article: Article, navController: NavController) {
     Card(
         modifier = Modifier
-            .padding(5.dp)
+            .padding(8.dp)
             .fillMaxWidth()
-            .combinedClickable (
+            .combinedClickable(
                 onClick = {
-                    val json = Uri.encode(Gson().toJson(article))  // Convert Article to JSON string
+                    val json = Uri.encode(Gson().toJson(article)) // Convert Article to JSON string
                     navController.navigate("news_detail/$json")
                 }
             ),
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.secondaryContainer)
-                .padding(10.dp)
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
         ) {
+            // **Full-Size Image Without Curves**
             AsyncImage(
                 model = article.urlToImage,
                 contentDescription = article.title,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
-                    .clip(MaterialTheme.shapes.small), // Apply rounded corners
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.TopCenter
+                    .height(200.dp), // Set a fixed height without clipping
+                contentScale = ContentScale.Crop // Crop to maintain aspect ratio
             )
 
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(10.dp))
+            // **Title & Source Section**
+            Column(
+                modifier = Modifier.padding(12.dp)
+            ) {
+                Text(
+                    text = article.title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            Text(
-                text = article.title,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                modifier = Modifier.fillMaxWidth()
-            )
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = article.source?.name ?: "Unknown Source",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+
+                    Text(
+                        text = article.publishedAt?.toFormattedDate() ?: "",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
         }
     }
 }
+
 
 fun String.toFormattedDate(): String {
     return try {
