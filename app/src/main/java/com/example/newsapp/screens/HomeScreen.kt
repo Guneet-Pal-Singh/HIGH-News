@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
@@ -181,10 +182,12 @@ fun ArticleCard(article: Article, navController: NavController) {
                 contentDescription = article.title,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(160.dp),
+                    .height(180.dp)
+                    .clip(MaterialTheme.shapes.small), // Apply rounded corners
                 contentScale = ContentScale.Crop,
                 alignment = Alignment.TopCenter
             )
+
 
             Spacer(modifier = Modifier.height(10.dp))
 

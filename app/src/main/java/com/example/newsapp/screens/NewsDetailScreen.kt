@@ -65,6 +65,8 @@ fun formatIndianTime(dateString: String): String {
 
 @Composable
 fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
+    val cleanedTitle = article.title.removeSuffix(" - ${article.source.name}")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -72,7 +74,7 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
             .verticalScroll(rememberScrollState())
     ) {
         Text(
-            text = article.title,
+            text = cleanedTitle,
             style = TextStyle(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
@@ -90,7 +92,7 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
                 fontFamily = FontFamily.SansSerif
             ),
             textAlign = TextAlign.Start,
-            modifier = Modifier.padding(bottom = 8.dp)
+//            modifier = Modifier.padding(bottom = 8.dp)
         )
 
         Card(
@@ -98,7 +100,7 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp)
-                .padding(bottom = 18.dp, top = 12.dp)
+                .padding(bottom = 25.dp, top = 25.dp)
         ) {
             Image(
                 painter = rememberAsyncImagePainter(article.urlToImage),
@@ -122,12 +124,12 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
         Text(
             text = article.content.replace(Regex("\\[\\+\\d+ chars]"), "") +
                     "\n\nTo read the full article, click on the 'Read More' button below.",
-            style = TextStyle( // Applying the same style as description
+            style = TextStyle(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
                 fontFamily = FontFamily.Serif
             ),
-            textAlign = TextAlign.Start, // Same alignment as description
+            textAlign = TextAlign.Start,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
