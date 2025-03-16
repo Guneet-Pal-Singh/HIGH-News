@@ -266,7 +266,7 @@ fun ArticleCard(article: Article, navController: NavController) {
                 contentDescription = article.title,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp), // Set a fixed height without clipping
+                    .height(250.dp), // Set a fixed height without clipping
                 contentScale = ContentScale.Crop // Crop to maintain aspect ratio
             )
 
