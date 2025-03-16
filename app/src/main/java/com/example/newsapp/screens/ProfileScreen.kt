@@ -72,7 +72,7 @@ fun ProfileScreen(navController: NavHostController) {
 
 @Composable
 fun BookmarkList() {
-    val bookmarks = listOf("Article 1", "Article 2", "Article 3") // Replace with real data
+    val bookmarks = listOf("Article 1", "Article 2", "Article 3") // TODO Replace with real data
 
     if (bookmarks.isEmpty()) {
         Text(

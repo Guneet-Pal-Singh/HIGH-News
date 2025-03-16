@@ -58,7 +58,7 @@ fun RegisterScreen(navController: NavController) {
                 )
             )
 
-            // Tagline - More Elegant Font Style
+            // Tagline
             Text(
                 text = "Get HIGH on information",
                 style = MaterialTheme.typography.bodyLarge.copy(

@@ -96,7 +96,6 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
                 fontFamily = FontFamily.SansSerif
             ),
             textAlign = TextAlign.Start,
-//            modifier = Modifier.padding(bottom = 8.dp)
         )
 
         Card(
@@ -146,7 +145,7 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
                 .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            val context = LocalContext.current  // Get the context
+            val context = LocalContext.current
 
             Button(
                 onClick = {

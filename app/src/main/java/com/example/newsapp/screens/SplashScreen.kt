@@ -29,7 +29,6 @@ fun SplashScreen(navController: NavController) {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
 
-    // Compute screen diagonal for full coverage
     val screenWidthDp = configuration.screenWidthDp.dp
     val screenHeightDp = configuration.screenHeightDp.dp
     val screenWidthPx = with(density) { screenWidthDp.toPx() }
@@ -37,7 +36,6 @@ fun SplashScreen(navController: NavController) {
     val diagonalPx = kotlin.math.hypot(screenWidthPx, screenHeightPx)
     val diagonalDp = with(density) { diagonalPx.toDp() }
 
-    // Max circle size for full screen coverage
     val maxCircleSize = remember { diagonalDp * 2f }
 
     // Animate circle expansion
@@ -81,7 +79,6 @@ fun SplashScreen(navController: NavController) {
                     .background(MaterialTheme.colorScheme.primary)
             )
 
-            // Logo stays fixed at center
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "App Logo",

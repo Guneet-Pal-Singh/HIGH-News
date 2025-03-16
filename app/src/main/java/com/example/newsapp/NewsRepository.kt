@@ -3,7 +3,6 @@ package com.example.newsapp
 import com.example.newsapp.api.APIInstance
 import com.example.newsapp.api.NewsResponse
 import android.util.Log
-import com.example.newsapp.constants.Constants
 import retrofit2.Response
 
 class NewsRepository {

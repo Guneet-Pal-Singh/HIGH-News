@@ -116,13 +116,12 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
 
                 Text(
                     text = "CATEGORIES",
-                    fontWeight = FontWeight.ExtraBold, // Bolder for emphasis
-                    fontSize = 18.sp, // Reduced for better proportion
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 18.sp,
                     letterSpacing = 1.2.sp,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .fillMaxWidth()
-                        //.background(MaterialTheme.colorScheme.) // Light background for distinction
                         .padding(top = 12.dp, start = 16.dp , end = 16.dp)
                 )
 
@@ -130,36 +129,36 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
 
                 categories.forEach { category ->
                     val isSelected = category == selectedCategory
-                    val icon = categoryIcons[category] ?: Icons.Default.Public // Default icon if not found
+                    val icon = categoryIcons[category] ?: Icons.Default.Public
 
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 4.dp , bottom = 4.dp , end = 4.dp)
-                            .background( // ✅ Background now covers both the icon & text
+                            .background(
                                 color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
                                 shape = RoundedCornerShape(topEnd = 25.dp, bottomEnd = 25.dp)
                             )
                             .clickable {
                                 selectedCategory = category
-                                coroutineScope.launch { drawerState.close() } // Close drawer on selection
-                                viewModel.fetchTopHeadlines(category.lowercase()) // Trigger API call
+                                coroutineScope.launch { drawerState.close() }
+                                viewModel.fetchTopHeadlines(category.lowercase())
                             }
-                            .padding(vertical = 12.dp, horizontal = 16.dp), // ✅ Ensures everything is inside the highlighted area
+                            .padding(vertical = 12.dp, horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             imageVector = icon,
                             contentDescription = "$category Icon",
-                            tint = if (isSelected) Color.White else MaterialTheme.colorScheme.primary, // ✅ Icon turns white when selected
+                            tint = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )
 
-                        Spacer(modifier = Modifier.width(12.dp)) // ✅ Ensures proper spacing between icon and text
+                        Spacer(modifier = Modifier.width(12.dp))
 
                         Text(
                             text = category,
-                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.primary, // ✅ Text also turns white when selected
+                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
                             fontFamily = FontFamily.SansSerif,
                             fontWeight = FontWeight.Medium,
                             fontSize = 14.sp
@@ -178,7 +177,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
             SearchBar(
                 searchQuery = searchQuery,
                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
-                navController = navController // Pass the actual NavController
+                navController = navController
             )
             NewsList(newsResponse?.articles, navController)
         }
@@ -196,7 +195,7 @@ fun SearchBar(searchQuery: MutableState<String>, onMenuClick: () -> Unit , navCo
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         IconButton(
-            onClick = { onMenuClick() }, // Open sidebar
+            onClick = { onMenuClick() },
             modifier = Modifier.padding(vertical = 5.dp)
         ) {
             Icon(
@@ -225,7 +224,7 @@ fun SearchBar(searchQuery: MutableState<String>, onMenuClick: () -> Unit , navCo
         )
 
         IconButton(
-            onClick = { navController.navigate("profile_screen") }, // Navigate to Profile Screen
+            onClick = { navController.navigate("profile_screen") },
             modifier = Modifier.padding(vertical = 5.dp)
         ) {
             Icon(
@@ -268,7 +267,7 @@ fun ArticleCard(article: Article, navController: NavController) {
             .fillMaxWidth()
             .combinedClickable(
                 onClick = {
-                    val json = Uri.encode(Gson().toJson(article)) // Convert Article to JSON string
+                    val json = Uri.encode(Gson().toJson(article))
                     navController.navigate("news_detail/$json")
                 }
             ),
@@ -278,19 +277,17 @@ fun ArticleCard(article: Article, navController: NavController) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.surface)
         ) {
-            // **Full-Size Image Without Curves**
             AsyncImage(
                 model = article.urlToImage,
                 contentDescription = article.title,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(250.dp), // Set a fixed height without clipping
-                contentScale = ContentScale.Crop // Crop to maintain aspect ratio
+                    .height(250.dp),
+                contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // **Title & Source Section**
             Column(
                 modifier = Modifier.padding(12.dp)
             ) {

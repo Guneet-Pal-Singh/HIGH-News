@@ -57,12 +57,12 @@ fun LoginScreen(navController: NavController) {
                 )
             )
 
-            // Tagline - More Elegant Font Style
+            // Tagline
             Text(
                 text = "Get HIGH on information",
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = 18.sp,
-                    fontFamily = FontFamily.Monospace, // Adds a modern feel
+                    fontFamily = FontFamily.Monospace,
                     color = secondaryColor
                 )
             )
