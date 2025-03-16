@@ -5,11 +5,13 @@ import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
@@ -52,7 +54,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
     val categories = listOf("General", "Business", "Health", "Entertainment", "Science", "Sports", "Technology")
-    val selectedCategory = remember { mutableStateOf("General") }
+    var selectedCategory by remember { mutableStateOf(categories.firstOrNull() ?: "") } // Default to first category
 
     val categoryIcons = mapOf(
         "General" to Icons.Default.Public,
@@ -63,6 +65,8 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
         "Sports" to Icons.Default.SportsSoccer,
         "Technology" to Icons.Default.Computer
     )
+
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -113,22 +117,36 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
                 )
 
                 categories.forEach { category ->
-                    NavigationDrawerItem(
-                        label = { Text(text = category) },
-                        icon = {
-                            Icon(
-                                imageVector = categoryIcons[category] ?: Icons.Default.Public,
-                                contentDescription = category
+                    val isSelected = category == selectedCategory
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                            .clickable {
+                                selectedCategory = category
+                                coroutineScope.launch { drawerState.close() } // Close drawer on selection
+                                viewModel.fetchTopHeadlines(category.lowercase()) // Trigger API call
+                            }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(50.dp)
+                                .background(
+                                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                    shape = RoundedCornerShape(topEnd = 25.dp, bottomEnd = 25.dp)
+                                )
+                                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
+                        ) {
+                            Text(
+                                text = category,
+                                color = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
                             )
-                        },
-                        selected = selectedCategory.value == category,
-                        onClick = {
-                            selectedCategory.value = category
-                            coroutineScope.launch { drawerState.close() }
-                            viewModel.fetchTopHeadlines(category.lowercase()) // Trigger API call
-                        },
-                        modifier = Modifier.padding(4.dp)
-                    )
+                        }
+                    }
                 }
             }
         }
@@ -294,7 +312,7 @@ fun ArticleCard(article: Article, navController: NavController) {
 fun String.toFormattedDate(): String {
     return try {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH)
-        val outputFormat = SimpleDateFormat("dd - MMMM - yyyy", Locale.ENGLISH)
+        val outputFormat = SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH)
         val date = inputFormat.parse(this)
         outputFormat.format(date ?: Date())
     } catch (e: Exception) {
