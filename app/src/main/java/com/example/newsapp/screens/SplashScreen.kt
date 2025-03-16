@@ -59,7 +59,7 @@ fun SplashScreen(navController: NavController) {
         expandCircle = true
         delay(150) // Wait for circle to fully expand
         morphToRectangle = true
-        delay(250)  // Give time for the rectangle transition
+        delay(500)  // Give time for the rectangle transition
         navController.navigate("main_screen") {
             popUpTo("splash_screen") { inclusive = true }
         }

@@ -43,7 +43,12 @@ import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.SportsSoccer
 import androidx.compose.material.icons.filled.Computer
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.room.util.copy
 import com.example.newsapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,50 +107,63 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
                     )
                     Text(
                         text = "Get HIGH on information",
-                        fontSize = 14.sp,
+                        fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
 
-                // **Categories Section**
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
-                    text = "Categories",
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 20.sp,
+                    text = "CATEGORIES",
+                    fontWeight = FontWeight.ExtraBold, // Bolder for emphasis
+                    fontSize = 18.sp, // Reduced for better proportion
+                    letterSpacing = 1.2.sp,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        //.background(MaterialTheme.colorScheme.) // Light background for distinction
+                        .padding(top = 12.dp, start = 16.dp , end = 16.dp)
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 categories.forEach { category ->
                     val isSelected = category == selectedCategory
+                    val icon = categoryIcons[category] ?: Icons.Default.Public // Default icon if not found
 
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(4.dp)
+                            .padding(top = 4.dp , bottom = 4.dp , end = 4.dp)
+                            .background( // ✅ Background now covers both the icon & text
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                shape = RoundedCornerShape(topEnd = 25.dp, bottomEnd = 25.dp)
+                            )
                             .clickable {
                                 selectedCategory = category
                                 coroutineScope.launch { drawerState.close() } // Close drawer on selection
                                 viewModel.fetchTopHeadlines(category.lowercase()) // Trigger API call
                             }
+                            .padding(vertical = 12.dp, horizontal = 16.dp), // ✅ Ensures everything is inside the highlighted area
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(50.dp)
-                                .background(
-                                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-                                    shape = RoundedCornerShape(topEnd = 25.dp, bottomEnd = 25.dp)
-                                )
-                                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
-                        ) {
-                            Text(
-                                text = category,
-                                color = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp
-                            )
-                        }
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = "$category Icon",
+                            tint = if (isSelected) Color.White else MaterialTheme.colorScheme.primary, // ✅ Icon turns white when selected
+                            modifier = Modifier.size(24.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(12.dp)) // ✅ Ensures proper spacing between icon and text
+
+                        Text(
+                            text = category,
+                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.primary, // ✅ Text also turns white when selected
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp
+                        )
                     }
                 }
             }
