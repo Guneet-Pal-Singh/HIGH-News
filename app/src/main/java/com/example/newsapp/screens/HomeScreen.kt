@@ -150,7 +150,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
                         Icon(
                             imageVector = icon,
                             contentDescription = "$category Icon",
-                            tint = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
+                            tint =  if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )
 
@@ -158,7 +158,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
 
                         Text(
                             text = category,
-                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                             fontFamily = FontFamily.SansSerif,
                             fontWeight = FontWeight.Medium,
                             fontSize = 14.sp
