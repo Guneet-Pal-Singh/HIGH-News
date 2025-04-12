@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.newsapp.R
 import kotlinx.coroutines.delay
+import com.google.firebase.auth.FirebaseAuth
+
 
 @Composable
 fun SplashScreen(navController: NavController) {
@@ -35,7 +37,7 @@ fun SplashScreen(navController: NavController) {
     val screenHeightPx = with(density) { screenHeightDp.toPx() }
     val diagonalPx = kotlin.math.hypot(screenWidthPx, screenHeightPx)
     val diagonalDp = with(density) { diagonalPx.toDp() }
-
+    val auth = FirebaseAuth.getInstance()
     val maxCircleSize = remember { diagonalDp * 2f }
 
     // Animate circle expansion
@@ -51,15 +53,22 @@ fun SplashScreen(navController: NavController) {
         animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
         label = "Shape Morphing"
     )
-
     LaunchedEffect(Unit) {
         delay(500)  // Initial delay before animation starts
         expandCircle = true
-        delay(150) // Wait for circle to fully expand
+        delay(150)  // Wait briefly to show circle expanding
         morphToRectangle = true
         delay(500)  // Give time for the rectangle transition
-        navController.navigate("main_screen") {
-            popUpTo("splash_screen") { inclusive = true }
+
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            navController.navigate("home_screen") {
+                popUpTo("login_screen") { inclusive = true }
+            }
+        } else {
+            navController.navigate("main_screen") {
+                popUpTo("splash_screen") { inclusive = true }
+            }
         }
     }
 

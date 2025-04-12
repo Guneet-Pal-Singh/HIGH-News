@@ -1,5 +1,6 @@
 package com.example.newsapp.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,30 +11,33 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.newsapp.R
-import com.example.newsapp.ui.theme.NewsAppTheme
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun LoginScreen(navController: NavController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    val context = LocalContext.current
+    val auth = FirebaseAuth.getInstance()
+
     val primaryColor = MaterialTheme.colorScheme.primary
     val secondaryColor = MaterialTheme.colorScheme.secondary
     val backgroundColor = MaterialTheme.colorScheme.background
     val surfaceColor = MaterialTheme.colorScheme.surface
     val textColor = MaterialTheme.colorScheme.onSurface
+
+    // ✅ Auto-login if user already signed in
 
     Box(
         modifier = Modifier
@@ -46,18 +50,16 @@ fun LoginScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            // App Name
             Text(
                 text = "HIGH News",
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontSize = 36.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    fontFamily = FontFamily.Serif, // Stylish serif font
+                    fontFamily = FontFamily.Serif,
                     color = primaryColor
                 )
             )
 
-            // Tagline
             Text(
                 text = "Get HIGH on information",
                 style = MaterialTheme.typography.bodyLarge.copy(
@@ -69,12 +71,11 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Logo
             Box(
                 modifier = Modifier
                     .size(160.dp)
                     .clip(CircleShape)
-                    .background(color = MaterialTheme.colorScheme.primary)
+                    .background(color = primaryColor)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logo),
@@ -87,7 +88,6 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Login Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -112,7 +112,7 @@ fun LoginScreen(navController: NavController) {
                     OutlinedTextField(
                         value = username,
                         onValueChange = { username = it },
-                        label = { Text("Username") },
+                        label = { Text("Email") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
                     )
@@ -132,8 +132,23 @@ fun LoginScreen(navController: NavController) {
 
                     Button(
                         onClick = {
-                            navController.navigate("main_screen") {
-                                popUpTo("login_screen") { inclusive = true }
+                            if (username.isBlank() || password.isBlank()) {
+                                Toast.makeText(context, "Fields cannot be empty", Toast.LENGTH_SHORT).show()
+                            } else {
+                                auth.signInWithEmailAndPassword(username, password)
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            navController.navigate("home_screen") {
+                                                popUpTo("login_screen") { inclusive = true }
+                                            }
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "Login failed: ${task.exception?.message}",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    }
                             }
                         },
                         modifier = Modifier
@@ -155,9 +170,8 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Google Login Button
             Button(
-                onClick = { /* Google Login */ },
+                onClick = { /* Google login logic here */ },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -177,11 +191,9 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Skip to Home
             TextButton(onClick = { navController.navigate("home_screen") }) {
                 Text("Skip to Home", color = secondaryColor)
             }
         }
     }
 }
-

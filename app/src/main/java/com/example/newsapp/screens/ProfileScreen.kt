@@ -16,9 +16,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.newsapp.R
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
+    val auth = FirebaseAuth.getInstance()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -38,7 +41,7 @@ fun ProfileScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // User Info
+        // User Info (can be fetched dynamically if needed)
         Text(text = "John Doe", style = MaterialTheme.typography.headlineMedium)
         Text(text = "johndoe@example.com", color = Color.Gray)
 
@@ -53,6 +56,23 @@ fun ProfileScreen(navController: NavHostController) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Logout Button
+        Button(
+            onClick = {
+                auth.signOut()
+                navController.navigate("main_screen") {
+                    popUpTo("profile_screen") { inclusive = true }
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+        ) {
+            Text("Logout", color = MaterialTheme.colorScheme.onError)
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         // My Bookmarks Section
         Text(
