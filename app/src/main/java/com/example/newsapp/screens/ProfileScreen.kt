@@ -1,11 +1,14 @@
 package com.example.newsapp.screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,9 +20,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.newsapp.R
+import com.example.newsapp.db.BookmarkEntity
 import com.example.newsapp.db.UserDatabase
-import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
@@ -27,15 +32,24 @@ fun ProfileScreen(navController: NavHostController) {
     val auth = FirebaseAuth.getInstance()
     val userEmail = auth.currentUser?.email
     var userName by remember { mutableStateOf("") }
+    var bookmarks by remember { mutableStateOf<List<BookmarkEntity>>(emptyList()) }
     val scope = rememberCoroutineScope()
 
-    // Fetch user's name from Room database using email
-    LaunchedEffect(userEmail) {
-        if (userEmail != null) {
-            val db = UserDatabase.getDatabase(context)
-            val user = db.userDao().getUserByEmail(userEmail)
-            userName = user?.name ?: "Unknown User"
+    // Function to refresh bookmarks
+    fun refreshBookmarks() {
+        scope.launch {
+            if (userEmail != null) {
+                val db = UserDatabase.getDatabase(context)
+                val user = db.userDao().getUserByEmail(userEmail)
+                userName = user?.name ?: "Unknown User"
+                bookmarks = db.userDao().getAllBookmarks()
+            }
         }
+    }
+
+    // Initial load
+    LaunchedEffect(Unit) {
+        refreshBookmarks()
     }
 
     Column(
@@ -61,7 +75,7 @@ fun ProfileScreen(navController: NavHostController) {
         Text(text = userName, style = MaterialTheme.typography.headlineMedium)
         Text(text = userEmail ?: "No Email", color = Color.Gray)
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Edit Profile Button
         Button(
@@ -71,7 +85,7 @@ fun ProfileScreen(navController: NavHostController) {
             Text("Edit Profile")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Logout Button
         Button(
@@ -101,14 +115,22 @@ fun ProfileScreen(navController: NavHostController) {
         Spacer(modifier = Modifier.height(8.dp))
 
         // Bookmarks List
-        BookmarkList()
+        BookmarkList(
+            bookmarks = bookmarks,
+            context = context,
+            scope = scope,
+            onDelete = { refreshBookmarks() }
+        )
     }
 }
 
 @Composable
-fun BookmarkList() {
-    val bookmarks = listOf("Article 1", "Article 2", "Article 3") // Replace with real data
-
+fun BookmarkList(
+    bookmarks: List<BookmarkEntity>,
+    context: Context,
+    scope: CoroutineScope,
+    onDelete: () -> Unit
+) {
     if (bookmarks.isEmpty()) {
         Text(
             text = "No bookmarks yet.",
@@ -117,20 +139,44 @@ fun BookmarkList() {
         )
     } else {
         Column(modifier = Modifier.fillMaxWidth()) {
-            bookmarks.forEach { bookmark ->
+            bookmarks.forEachIndexed { index, bookmark ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .clickable { /* Handle bookmark click */ },
-                    shape = RoundedCornerShape(8.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                        .padding(vertical = 6.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text(
-                        text = bookmark,
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = 12.dp, vertical = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "${index + 1}. ${bookmark.title}",
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        IconButton(
+                            onClick = {
+                                scope.launch {
+                                    val db = UserDatabase.getDatabase(context)
+                                    db.userDao().deleteBookmark(bookmark)
+                                    onDelete()
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete Bookmark",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
                 }
             }
         }

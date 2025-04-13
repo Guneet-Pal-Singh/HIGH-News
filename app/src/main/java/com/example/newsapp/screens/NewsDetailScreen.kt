@@ -2,8 +2,6 @@ package com.example.newsapp.screens
 
 import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -11,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -25,20 +24,42 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.newsapp.api.Article
+import com.example.newsapp.db.BookmarkEntity
+import com.example.newsapp.db.UserDatabase
+import kotlinx.coroutines.launch
 import java.util.*
-import androidx.compose.material.icons.filled.Bookmark
+import android.content.Context
 import androidx.compose.ui.platform.LocalContext
-
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun NewsDetailScreen(navController: NavController, article: Article) {
     var showWebView by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val db = UserDatabase.getDatabase(context)
+    val scope = rememberCoroutineScope()
+
+    fun addBookmark() {
+        scope.launch {
+            val existing = db.userDao().getBookmarkByUrl(article.url)
+            if (existing != null) {
+                Toast.makeText(context, "Already bookmarked!", Toast.LENGTH_SHORT).show()
+            } else {
+                val bookmark = BookmarkEntity(
+                    title = article.title,
+                    description = article.description,
+                    url = article.url
+                )
+                db.userDao().insertBookmark(bookmark)
+                Toast.makeText(context, "Bookmarked!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     if (showWebView) {
         WebViewScreen(article.url)
     } else {
-        NewsContent(article) { showWebView = true }
+        NewsContent(article, onReadMoreClick = { showWebView = true }, onBookmarkClick = { addBookmark() })
     }
 }
 
@@ -46,9 +67,8 @@ fun NewsDetailScreen(navController: NavController, article: Article) {
 fun WebViewScreen(url: String) {
     AndroidView(
         factory = { context ->
-            WebView(context).apply {
+            android.webkit.WebView(context).apply {
                 settings.javaScriptEnabled = true
-                webViewClient = WebViewClient()
                 loadUrl(url)
             }
         },
@@ -68,7 +88,7 @@ fun formatIndianTime(dateString: String): String {
 }
 
 @Composable
-fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
+fun NewsContent(article: Article, onReadMoreClick: () -> Unit, onBookmarkClick: () -> Unit) {
     val cleanedTitle = article.title.removeSuffix(" - ${article.source.name}")
 
     Column(
@@ -145,12 +165,8 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit) {
                 .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            val context = LocalContext.current
-
             Button(
-                onClick = {
-                    Toast.makeText(context, "Bookmarked!", Toast.LENGTH_SHORT).show()
-                },
+                onClick = onBookmarkClick,
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
