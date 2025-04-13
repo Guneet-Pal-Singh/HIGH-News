@@ -1,6 +1,8 @@
 package com.example.newsapp.screens
 
 import android.widget.Toast
+import com.example.newsapp.db.UserEntity
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -23,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.newsapp.R
+import com.example.newsapp.db.UserDatabase
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
@@ -62,8 +65,7 @@ fun RegisterScreen(navController: NavController) {
                 Text(
                     text = "HIGH News",
                     style = MaterialTheme.typography.headlineLarge.copy(
-                        fontSize = 36.sp,
-                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 36.sp,                        fontWeight = FontWeight.ExtraBold,
                         fontFamily = FontFamily.Serif,
                         color = primaryColor
                     )
@@ -156,14 +158,19 @@ fun RegisterScreen(navController: NavController) {
                                         .createUserWithEmailAndPassword(email.trim(), password.trim())
                                         .addOnCompleteListener { task ->
                                             if (task.isSuccessful) {
-                                                navController.navigate("main_screen") {
-                                                    popUpTo("register_screen") { inclusive = true }
+                                                scope.launch {
+                                                    val user = UserEntity(name = name.trim(), email = email.trim())
+                                                    val db = UserDatabase.getDatabase(context)
+                                                    db.userDao().insertUser(user)
+
+                                                    navController.navigate("main_screen") {
+                                                        popUpTo("register_screen") { inclusive = true }
+                                                    }
                                                 }
                                             } else {
                                                 scope.launch {
                                                     snackbarHostState.showSnackbar(
-                                                        message = task.exception?.message
-                                                            ?: "Registration failed",
+                                                        message = task.exception?.message ?: "Registration failed",
                                                         duration = SnackbarDuration.Short
                                                     )
                                                 }
@@ -177,7 +184,8 @@ fun RegisterScreen(navController: NavController) {
                                         )
                                     }
                                 }
-                            },
+                            }
+                            ,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp),

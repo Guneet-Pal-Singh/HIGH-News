@@ -12,15 +12,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.newsapp.R
+import com.example.newsapp.db.UserDatabase
+import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
+    val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
+    val userEmail = auth.currentUser?.email
+    var userName by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+
+    // Fetch user's name from Room database using email
+    LaunchedEffect(userEmail) {
+        if (userEmail != null) {
+            val db = UserDatabase.getDatabase(context)
+            val user = db.userDao().getUserByEmail(userEmail)
+            userName = user?.name ?: "Unknown User"
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -29,7 +45,7 @@ fun ProfileScreen(navController: NavHostController) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Profile Picture Placeholder
+        // Profile Picture
         Image(
             painter = painterResource(id = R.drawable.profileicon),
             contentDescription = "Profile Picture",
@@ -41,9 +57,9 @@ fun ProfileScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // User Info (can be fetched dynamically if needed)
-        Text(text = "John Doe", style = MaterialTheme.typography.headlineMedium)
-        Text(text = "johndoe@example.com", color = Color.Gray)
+        // User Info
+        Text(text = userName, style = MaterialTheme.typography.headlineMedium)
+        Text(text = userEmail ?: "No Email", color = Color.Gray)
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -65,8 +81,7 @@ fun ProfileScreen(navController: NavHostController) {
                     popUpTo("profile_screen") { inclusive = true }
                 }
             },
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
         ) {
             Text("Logout", color = MaterialTheme.colorScheme.onError)
@@ -74,7 +89,7 @@ fun ProfileScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // My Bookmarks Section
+        // Bookmarks Header
         Text(
             text = "My Bookmarks",
             style = MaterialTheme.typography.headlineSmall,
@@ -85,14 +100,14 @@ fun ProfileScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Placeholder for Bookmarked Articles
+        // Bookmarks List
         BookmarkList()
     }
 }
 
 @Composable
 fun BookmarkList() {
-    val bookmarks = listOf("Article 1", "Article 2", "Article 3") // TODO Replace with real data
+    val bookmarks = listOf("Article 1", "Article 2", "Article 3") // Replace with real data
 
     if (bookmarks.isEmpty()) {
         Text(
