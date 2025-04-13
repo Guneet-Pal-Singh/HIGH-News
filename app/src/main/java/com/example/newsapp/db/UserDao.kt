@@ -1,5 +1,6 @@
 package com.example.newsapp.db
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -21,7 +22,7 @@ interface UserDao {
 
     // Get all bookmarks
     @Query("SELECT * FROM bookmarks")
-    suspend fun getAllBookmarks(): List<BookmarkEntity>
+    fun getAllBookmarks(): LiveData<List<BookmarkEntity>>
 
     // Delete a specific bookmark by its object
     @Delete

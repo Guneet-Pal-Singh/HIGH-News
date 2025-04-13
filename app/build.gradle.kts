@@ -69,6 +69,7 @@ dependencies {
 
     // Room Database dependencies
     implementation("androidx.room:room-runtime:2.7.0")
+    implementation(libs.firebase.auth.ktx)
     kapt("androidx.room:room-compiler:2.7.0") // Kotlin annotation processing
 
     testImplementation(libs.junit)

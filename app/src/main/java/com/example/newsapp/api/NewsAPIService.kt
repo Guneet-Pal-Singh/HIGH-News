@@ -1,4 +1,5 @@
 import com.example.newsapp.api.NewsResponse
+import com.example.newsapp.constants.Constants
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.GET
@@ -13,5 +14,20 @@ interface NewsAPIService {
         @Query("query") q:String?=null,
         @Query("pageSize") pageSize:Int?=null,
         @Query("page") page:Int?=null
+    ): Response<NewsResponse>
+
+    suspend fun getEverything(
+        @Query("q") q: String,
+        @Query("pageSize") pageSize: Int? = null,
+        @Query("page") page: Int? = null,
+        @Query("sortBy") sortBy: String? = null,
+        @Query("from") from: String? = null,
+        @Query("to") to: String? = null,
+        @Query("language") language: String? = null,
+        @Query("sources") sources: String? = null,
+        @Query("domains") domains: String? = null,
+        @Query("excludeDomains") excludeDomains: String? = null,
+        @Query("language") language2: String? = null,
+        @Query("apiKey") apiKey: String=Constants.API_KEY,
     ): Response<NewsResponse>
 }
