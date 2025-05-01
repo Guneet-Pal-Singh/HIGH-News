@@ -1,56 +1,39 @@
 package com.example.newsapp.screens
 
-import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.example.newsapp.R
 import com.example.newsapp.db.BookmarkEntity
-import com.example.newsapp.db.UserDatabase
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileScreen(navController: NavHostController) {
-    val context = LocalContext.current
+fun ProfileScreen(navController: NavHostController,ViewModel: ViewModelProfileScreen) {
     val auth = FirebaseAuth.getInstance()
     val userEmail = auth.currentUser?.email
     var userName by remember { mutableStateOf("") }
-    var bookmarks by remember { mutableStateOf<List<BookmarkEntity>>(emptyList()) }
-    val scope = rememberCoroutineScope()
+    val bookmarks by ViewModel.readAllData.observeAsState(emptyList())
 
-    // Function to refresh bookmarks
-    fun refreshBookmarks() {
-        scope.launch {
-            if (userEmail != null) {
-                val db = UserDatabase.getDatabase(context)
-                val user = db.userDao().getUserByEmail(userEmail)
-                userName = user?.name ?: "Unknown User"
-                bookmarks = db.userDao().getAllBookmarks()
-            }
-        }
-    }
-
-    // Initial load
-    LaunchedEffect(Unit) {
-        refreshBookmarks()
-    }
 
     Column(
         modifier = Modifier
@@ -117,9 +100,7 @@ fun ProfileScreen(navController: NavHostController) {
         // Bookmarks List
         BookmarkList(
             bookmarks = bookmarks,
-            context = context,
-            scope = scope,
-            onDelete = { refreshBookmarks() }
+            viewModel=ViewModel
         )
     }
 }
@@ -127,10 +108,9 @@ fun ProfileScreen(navController: NavHostController) {
 @Composable
 fun BookmarkList(
     bookmarks: List<BookmarkEntity>,
-    context: Context,
-    scope: CoroutineScope,
-    onDelete: () -> Unit
+    viewModel: ViewModelProfileScreen
 ) {
+    Log.d("BookmarkList", "Bookmarks: $bookmarks")
     if (bookmarks.isEmpty()) {
         Text(
             text = "No bookmarks yet.",
@@ -138,8 +118,8 @@ fun BookmarkList(
             modifier = Modifier.padding(8.dp)
         )
     } else {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            bookmarks.forEachIndexed { index, bookmark ->
+        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            itemsIndexed(bookmarks) { index, bookmark ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -150,31 +130,55 @@ fun BookmarkList(
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 12.dp, vertical = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 16.dp),
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Text(
-                            text = "${index + 1}. ${bookmark.title}",
-                            modifier = Modifier.weight(1f),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        IconButton(
-                            onClick = {
-                                scope.launch {
-                                    val db = UserDatabase.getDatabase(context)
-                                    db.userDao().deleteBookmark(bookmark)
-                                    onDelete()
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "Delete Bookmark",
-                                tint = MaterialTheme.colorScheme.error
+
+                        if (bookmark.imageURL=="empty") {
+                            Image(
+                                painter = painterResource(id = R.drawable.placeholder_image),
+                                contentDescription = "Bookmark Image",
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.primary)
                             )
+                        } else {
+                            AsyncImage(
+                                model = bookmark.imageURL,
+                                contentDescription = "Bookmark Image",
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.primary),
+                                placeholder = painterResource(id = R.drawable.placeholder_image),
+                                error= painterResource(id = R.drawable.error_image)
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp, vertical = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "${index + 1}. ${bookmark.title}",
+                                modifier = Modifier.weight(1f),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            IconButton(
+                                onClick = {
+                                    viewModel.delete(bookmark)
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Delete,
+                                    contentDescription = "Delete Bookmark",
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
                         }
                     }
                 }

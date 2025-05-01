@@ -20,4 +20,8 @@ class Repository (private val userDao: UserDao) {
     suspend fun deleteBookmark(bookmark: BookmarkEntity) {
         userDao.deleteBookmark(bookmark)
     }
+
+    suspend fun isBookmarkExists(url: String): Boolean {
+        return userDao.getBookmarkByUrl(url) != null
+    }
 }

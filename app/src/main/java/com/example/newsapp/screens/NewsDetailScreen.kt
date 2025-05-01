@@ -2,7 +2,6 @@ package com.example.newsapp.screens
 
 import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -25,35 +24,23 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.newsapp.api.Article
 import com.example.newsapp.db.BookmarkEntity
-import com.example.newsapp.db.UserDatabase
-import kotlinx.coroutines.launch
 import java.util.*
-import android.content.Context
-import androidx.compose.ui.platform.LocalContext
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun NewsDetailScreen(navController: NavController, article: Article) {
+fun NewsDetailScreen(navController: NavController, article: Article,viewModelProfileScreen: ViewModelProfileScreen) {
     var showWebView by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    val db = UserDatabase.getDatabase(context)
-    val scope = rememberCoroutineScope()
 
     fun addBookmark() {
-        scope.launch {
-            val existing = db.userDao().getBookmarkByUrl(article.url)
-            if (existing != null) {
-                Toast.makeText(context, "Already bookmarked!", Toast.LENGTH_SHORT).show()
-            } else {
-                val bookmark = BookmarkEntity(
-                    title = article.title,
-                    description = article.description,
-                    url = article.url
-                )
-                db.userDao().insertBookmark(bookmark)
-                Toast.makeText(context, "Bookmarked!", Toast.LENGTH_SHORT).show()
-            }
-        }
+        viewModelProfileScreen.insertIfNotExists(
+            BookmarkEntity(
+                id = 0,
+                title = article.title,
+                url = article.url,
+                description = article.description,
+                imageURL = article.urlToImage ?: "empty"
+            )
+        )
     }
 
     if (showWebView) {

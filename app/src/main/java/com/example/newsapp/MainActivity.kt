@@ -25,6 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             NewsAppTheme {
                 val navController = rememberNavController()
+                val viewModel = ViewModelProfileScreen(application = this.application)
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NavHost(
                         navController = navController,
@@ -35,11 +36,11 @@ class MainActivity : ComponentActivity() {
                         composable("main_screen") { LoginScreen(navController) }
                         composable("home_screen") { HomeScreen(navController) }
                         composable("register_screen") { RegisterScreen(navController) }
-                        composable("profile_screen") { ProfileScreen(navController) }
+                        composable("profile_screen") { ProfileScreen(navController,viewModel) }
                         composable("news_detail/{article}") { backStackEntry ->
                             val json = backStackEntry.arguments?.getString("article")
                             val article = Gson().fromJson(json, Article::class.java)
-                            NewsDetailScreen(navController, article)
+                            NewsDetailScreen(navController, article,viewModel)
                         }
                     }
                 }

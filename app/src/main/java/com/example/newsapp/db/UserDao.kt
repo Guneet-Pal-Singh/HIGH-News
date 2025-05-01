@@ -30,5 +30,4 @@ interface UserDao {
 
     @Query("SELECT * FROM bookmarks WHERE url = :url LIMIT 1")
     suspend fun getBookmarkByUrl(url: String): BookmarkEntity?
-
 }

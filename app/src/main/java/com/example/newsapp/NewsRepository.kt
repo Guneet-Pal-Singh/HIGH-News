@@ -47,7 +47,7 @@ class NewsRepository {
                     null
                 }
             } catch (e: Exception) {
-                Log.e("NewsRepository", "Exception: ${e.localizedMessage}")
+                Log.e("NewsRepository", "Exception: ${e::class.qualifiedName}",e)
                 null
             }
         }

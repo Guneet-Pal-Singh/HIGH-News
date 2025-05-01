@@ -4,8 +4,6 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newsapp.db.BookmarkEntity
 import com.example.newsapp.db.Repository
@@ -36,7 +34,14 @@ class ViewModelProfileScreen(application: Application) : AndroidViewModel(applic
         }
     }
 
-    fun getBookMarks(): LiveData<List<BookmarkEntity>> {
-        return readAllData
+    fun insertIfNotExists(bookmark: BookmarkEntity) {
+        viewModelScope.launch {
+            val exists = repository.isBookmarkExists(bookmark.url)
+            if (!exists) {
+                repository.insertBookmark(bookmark)
+            } else {
+                Log.d("Bookmark", "Already bookmarked: ${bookmark.url}")
+            }
+        }
     }
 }
