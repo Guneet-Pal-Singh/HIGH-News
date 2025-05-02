@@ -1,21 +1,14 @@
 package com.example.newsapp.screens
 
 import android.net.Uri
-import android.util.Log
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -24,32 +17,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.newsapp.R
 import com.example.newsapp.api.Article
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.Business
-import androidx.compose.material.icons.filled.LocalHospital
-import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.Science
-import androidx.compose.material.icons.filled.SportsSoccer
-import androidx.compose.material.icons.filled.Computer
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.room.util.copy
-import com.example.newsapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,8 +39,9 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
     val newsResponse by viewModel.newsResponse.observeAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+
     val categories = listOf("General", "Business", "Health", "Entertainment", "Science", "Sports", "Technology")
-    var selectedCategory by remember { mutableStateOf(categories.firstOrNull() ?: "") } // Default to first category
+    var selectedCategory by remember { mutableStateOf(categories.first()) }
 
     val categoryIcons = mapOf(
         "General" to Icons.Default.Public,
@@ -71,13 +53,10 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
         "Technology" to Icons.Default.Computer
     )
 
-
-
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                // **App Logo and Name**
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -88,7 +67,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
                         modifier = Modifier
                             .size(120.dp)
                             .clip(CircleShape)
-                            .background(color = MaterialTheme.colorScheme.primary)
+                            .background(MaterialTheme.colorScheme.primary)
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.logo),
@@ -112,7 +91,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
                     text = "CATEGORIES",
@@ -122,7 +101,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 12.dp, start = 16.dp , end = 16.dp)
+                        .padding(horizontal = 16.dp)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -134,14 +113,14 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 4.dp , bottom = 4.dp , end = 4.dp)
                             .background(
-                                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-                                shape = RoundedCornerShape(topEnd = 25.dp, bottomEnd = 25.dp)
+                                if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                RoundedCornerShape(topEnd = 25.dp, bottomEnd = 25.dp)
                             )
                             .clickable {
                                 selectedCategory = category
                                 coroutineScope.launch { drawerState.close() }
+                                searchQuery.value = ""
                                 viewModel.fetchTopHeadlines(category.lowercase())
                             }
                             .padding(vertical = 12.dp, horizontal = 16.dp),
@@ -150,12 +129,9 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
                         Icon(
                             imageVector = icon,
                             contentDescription = "$category Icon",
-                            tint =  if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp)
+                            tint = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
                         )
-
                         Spacer(modifier = Modifier.width(12.dp))
-
                         Text(
                             text = category,
                             color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
@@ -171,85 +147,77 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.background)
-                .padding(8.dp)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             SearchBar(
                 searchQuery = searchQuery,
                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
-                navController = navController
+                navController = navController,
+                onSearch = { query -> viewModel.searchArticles(query) }
             )
             NewsList(newsResponse?.articles, navController)
         }
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(searchQuery: MutableState<String>, onMenuClick: () -> Unit , navController: NavController) {
+fun SearchBar(
+    searchQuery: MutableState<String>,
+    onMenuClick: () -> Unit,
+    navController: NavController,
+    onSearch: (String) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(
-            onClick = { onMenuClick() },
-            modifier = Modifier.padding(vertical = 5.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Menu Icon",
-                tint = MaterialTheme.colorScheme.onSurface
-            )
+        IconButton(onClick = onMenuClick) {
+            Icon(Icons.Default.Menu, contentDescription = "Menu", tint = MaterialTheme.colorScheme.onSurface)
         }
 
         OutlinedTextField(
             value = searchQuery.value,
-            onValueChange = { searchQuery.value = it },
+            onValueChange = {
+                searchQuery.value = it
+                if (it.length > 2) {
+                    onSearch(it)
+                }
+            },
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 5.dp),
+                .padding(horizontal = 8.dp),
             placeholder = { Text("Search news...") },
             singleLine = true,
             leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search Icon",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
+                Icon(Icons.Default.Search, contentDescription = "Search", tint = MaterialTheme.colorScheme.onSurface)
             },
             colors = TextFieldDefaults.outlinedTextFieldColors()
         )
 
-        IconButton(
-            onClick = { navController.navigate("profile_screen") },
-            modifier = Modifier.padding(vertical = 5.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Profile Icon",
-                tint = MaterialTheme.colorScheme.onSurface
-            )
+        IconButton(onClick = { navController.navigate("profile_screen") }) {
+            Icon(Icons.Default.Person, contentDescription = "Profile", tint = MaterialTheme.colorScheme.onSurface)
         }
     }
 }
 
-
 @Composable
-fun NewsList(articles: List<Article>? , navController: NavController) {
-    LazyColumn(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+fun NewsList(articles: List<Article>?, navController: NavController) {
+    LazyColumn(modifier = Modifier.fillMaxWidth()) {
         articles?.filter { !it.urlToImage.isNullOrEmpty() }?.let { filteredArticles ->
             if (filteredArticles.isNotEmpty()) {
                 items(filteredArticles) { article ->
-                    ArticleCard(article , navController)
+                    ArticleCard(article, navController)
                 }
             } else {
                 item {
                     Text(
                         "No articles available",
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         textAlign = TextAlign.Center
                     )
                 }
@@ -274,9 +242,7 @@ fun ArticleCard(article: Article, navController: NavController) {
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(
-            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-        ) {
+        Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
             AsyncImage(
                 model = article.urlToImage,
                 contentDescription = article.title,
@@ -285,22 +251,14 @@ fun ArticleCard(article: Article, navController: NavController) {
                     .height(250.dp),
                 contentScale = ContentScale.Crop
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Column(
-                modifier = Modifier.padding(12.dp)
-            ) {
+            Column(modifier = Modifier.padding(12.dp)) {
                 Text(
                     text = article.title,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.fillMaxWidth()
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-
                 Spacer(modifier = Modifier.height(4.dp))
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -311,7 +269,6 @@ fun ArticleCard(article: Article, navController: NavController) {
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.secondary
                     )
-
                     Text(
                         text = article.publishedAt?.toFormattedDate() ?: "",
                         fontSize = 12.sp,
@@ -322,7 +279,6 @@ fun ArticleCard(article: Article, navController: NavController) {
         }
     }
 }
-
 
 fun String.toFormattedDate(): String {
     return try {

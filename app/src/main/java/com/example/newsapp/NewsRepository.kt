@@ -1,8 +1,9 @@
 package com.example.newsapp
 
+import android.util.Log
 import com.example.newsapp.api.APIInstance
 import com.example.newsapp.api.NewsResponse
-import android.util.Log
+import com.example.newsapp.constants.Constants
 import retrofit2.Response
 
 class NewsRepository {
@@ -15,6 +16,7 @@ class NewsRepository {
                 val response: Response<NewsResponse> = apiService.getTopHeadlines(
                     countryCode = "us",
                     category = category,
+                    apiKey = Constants.API_KEY
                 )
 
                 if (response.isSuccessful) {
@@ -25,18 +27,20 @@ class NewsRepository {
                     null
                 }
             } catch (e: Exception) {
-                Log.e("NewsRepository", "Exception: ${e.localizedMessage}")
+                Log.e("NewsRepository", "Exception: ${e.localizedMessage}", e)
                 null
             }
         }
 
-        suspend fun getEverything(query: String,sortBy: String? = null): NewsResponse? {
+        suspend fun getEverything(query: String, sortBy: String? = null): NewsResponse? {
             return try {
                 Log.d("NewsRepository", "Fetching everything for query: $query")
                 val response: Response<NewsResponse> = apiService.getEverything(
                     q = query,
                     pageSize = 10,
-                    page = 1
+                    page = 1,
+                    sortBy = sortBy,
+                    apiKey = Constants.API_KEY
                 )
 
                 if (response.isSuccessful) {
@@ -47,9 +51,14 @@ class NewsRepository {
                     null
                 }
             } catch (e: Exception) {
-                Log.e("NewsRepository", "Exception: ${e::class.qualifiedName}",e)
+                Log.e("NewsRepository", "Exception: ${e::class.qualifiedName}", e)
                 null
             }
+        }
+
+        // 🔧 NEW FUNCTION added to resolve searchArticles error
+        suspend fun searchArticles(query: String): NewsResponse? {
+            return getEverything(query)
         }
     }
 }

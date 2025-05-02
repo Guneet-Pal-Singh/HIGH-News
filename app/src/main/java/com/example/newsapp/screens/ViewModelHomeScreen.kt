@@ -17,6 +17,7 @@ class ViewModelHomeScreen : ViewModel() {
         fetchTopHeadlines("general") // Default category
     }
 
+    // Fetch articles based on the selected category
     fun fetchTopHeadlines(category: String) {
         viewModelScope.launch {
             Log.d("ViewModelHomeScreen", "Fetching $category news from repository...")
@@ -29,6 +30,27 @@ class ViewModelHomeScreen : ViewModel() {
                     Log.d("ViewModelHomeScreen", "Response received: ${response.status}")
                 } else {
                     Log.e("ViewModelHomeScreen", "Response is null")
+                }
+            } catch (e: Exception) {
+                _newsResponse.value = null
+                Log.e("ViewModelHomeScreen", "Error: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    // Fetch articles based on the search query
+    fun searchArticles(query: String) {
+        viewModelScope.launch {
+            Log.d("ViewModelHomeScreen", "Searching news with query: $query")
+
+            try {
+                val response: NewsResponse? = NewsRepository.searchArticles(query)
+                _newsResponse.value = response
+
+                if (response != null) {
+                    Log.d("ViewModelHomeScreen", "Search response received: ${response.status}")
+                } else {
+                    Log.e("ViewModelHomeScreen", "Search response is null")
                 }
             } catch (e: Exception) {
                 _newsResponse.value = null
