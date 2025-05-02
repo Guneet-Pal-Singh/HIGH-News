@@ -1,6 +1,7 @@
 package com.example.newsapp.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -22,11 +23,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
 import com.example.newsapp.db.BookmarkEntity
+import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun ProfileScreen(navController: NavHostController, ViewModel: ViewModelProfileScreen) {

@@ -2,6 +2,7 @@ package com.example.newsapp.screens
 
 import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -20,15 +22,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.newsapp.api.Article
 import com.example.newsapp.db.BookmarkEntity
+import kotlinx.coroutines.flow.collectLatest
 import java.util.*
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun NewsDetailScreen(navController: NavController, article: Article,viewModelProfileScreen: ViewModelProfileScreen) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(Unit) {
+        viewModelProfileScreen.toastMessage.collectLatest { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     var showWebView by remember { mutableStateOf(false) }
 
     fun addBookmark() {
