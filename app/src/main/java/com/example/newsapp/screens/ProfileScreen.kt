@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -19,21 +18,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import androidx.compose.ui.text.style.TextOverflow
 import com.example.newsapp.R
 import com.example.newsapp.db.BookmarkEntity
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun ProfileScreen(navController: NavHostController,ViewModel: ViewModelProfileScreen) {
+fun ProfileScreen(navController: NavHostController, ViewModel: ViewModelProfileScreen) {
     val auth = FirebaseAuth.getInstance()
     val userEmail = auth.currentUser?.email
     var userName by remember { mutableStateOf("") }
     val bookmarks by ViewModel.readAllData.observeAsState(emptyList())
-
 
     Column(
         modifier = Modifier
@@ -52,25 +52,23 @@ fun ProfileScreen(navController: NavHostController,ViewModel: ViewModelProfileSc
                 .background(MaterialTheme.colorScheme.primary)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
         // User Info
         Text(text = userName, style = MaterialTheme.typography.headlineMedium)
         Text(text = userEmail ?: "No Email", color = Color.Gray)
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Edit Profile Button
         Button(
             onClick = { /* Navigate to Edit Profile Screen */ },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Edit Profile")
+            Text("Edit Profile" , fontSize = 18.sp)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Logout Button
+// Logout Button
         Button(
             onClick = {
                 auth.signOut()
@@ -81,10 +79,14 @@ fun ProfileScreen(navController: NavHostController,ViewModel: ViewModelProfileSc
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
         ) {
-            Text("Logout", color = MaterialTheme.colorScheme.onError)
+            Text(
+                "Logout",
+                fontSize = 18.sp
+            )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Bookmarks Header
         Text(
@@ -100,7 +102,7 @@ fun ProfileScreen(navController: NavHostController,ViewModel: ViewModelProfileSc
         // Bookmarks List
         BookmarkList(
             bookmarks = bookmarks,
-            viewModel=ViewModel
+            viewModel = ViewModel
         )
     }
 }
@@ -130,14 +132,11 @@ fun BookmarkList(
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
                         val imageModifier = Modifier
-                            .size(100.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .clip(RoundedCornerShape(12.dp))
 
                         if (bookmark.imageURL == "empty") {
                             Image(
@@ -155,30 +154,33 @@ fun BookmarkList(
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                        Column(
-                            modifier = Modifier.weight(1f)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = "${index + 1}. ${bookmark.title}",
+                                text = "${bookmark.title}",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurface,
-                                maxLines = 3,
-                                overflow = TextOverflow.Ellipsis
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 5,
+                                overflow = TextOverflow.Clip,
+                                modifier = Modifier.weight(1f)
                             )
-                        }
 
-                        IconButton(
-                            onClick = {
-                                viewModel.delete(bookmark)
+                            IconButton(
+                                onClick = { viewModel.delete(bookmark) },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Delete,
+                                    contentDescription = "Delete Bookmark",
+                                    tint = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.size(24.dp)
+                                )
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "Delete Bookmark",
-                                tint = MaterialTheme.colorScheme.error
-                            )
                         }
                     }
                 }
