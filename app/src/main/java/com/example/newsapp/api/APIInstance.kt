@@ -1,6 +1,5 @@
 package com.example.newsapp.api
 
-import NewsAPIService
 import com.example.newsapp.constants.Constants
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
