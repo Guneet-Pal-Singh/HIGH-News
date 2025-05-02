@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation("androidx.compose.material:material-icons-extended:1.5.0")
+    implementation ("androidx.appcompat:appcompat:1.6.1")
 
     // Testing
     testImplementation(libs.junit)

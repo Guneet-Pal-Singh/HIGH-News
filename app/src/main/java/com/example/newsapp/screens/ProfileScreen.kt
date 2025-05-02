@@ -1,7 +1,8 @@
 package com.example.newsapp.screens
 
+import android.content.Context
 import android.util.Log
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -23,14 +24,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
 import com.example.newsapp.db.BookmarkEntity
-import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.flow.collectLatest
+import androidx.core.content.edit
 
 @Composable
 fun ProfileScreen(navController: NavHostController, ViewModel: ViewModelProfileScreen) {
@@ -108,6 +107,9 @@ fun ProfileScreen(navController: NavHostController, ViewModel: ViewModelProfileS
             bookmarks = bookmarks,
             viewModel = ViewModel
         )
+
+        // Theme Selection
+        Theme()
     }
 }
 
@@ -191,4 +193,35 @@ fun BookmarkList(
             }
         }
     }
+}
+
+@Composable
+fun Theme(){
+    Column(modifier = Modifier.padding(5.dp)) {
+        Button(onClick = {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }) {
+            Text(text = "Light Theme")
+        }
+
+        Button(onClick = {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        }) {
+            Text(text = "Dark Theme")
+        }
+
+        Button(onClick = { AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) }) {
+            Text(text = "System Default")
+        }
+    }
+}
+
+fun saveThemePreference(context: Context, mode: String) {
+    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    prefs.edit() { putString("theme_mode", mode) }
+}
+
+fun loadThemePreference(context: Context): String {
+    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    return prefs.getString("theme_mode", "system") ?: "system"
 }
