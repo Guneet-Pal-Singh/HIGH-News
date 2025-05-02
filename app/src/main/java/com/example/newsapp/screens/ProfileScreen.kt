@@ -22,7 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.newsapp.R
 import com.example.newsapp.db.BookmarkEntity
 import com.google.firebase.auth.FirebaseAuth
@@ -130,55 +130,55 @@ fun BookmarkList(
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 16.dp),
-                        verticalArrangement = Arrangement.Center
+                    Row(
+                        modifier = Modifier
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        val imageModifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(8.dp))
 
-                        if (bookmark.imageURL=="empty") {
+                        if (bookmark.imageURL == "empty") {
                             Image(
                                 painter = painterResource(id = R.drawable.placeholder_image),
                                 contentDescription = "Bookmark Image",
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(MaterialTheme.colorScheme.primary)
+                                modifier = imageModifier
                             )
                         } else {
                             AsyncImage(
                                 model = bookmark.imageURL,
                                 contentDescription = "Bookmark Image",
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(MaterialTheme.colorScheme.primary),
+                                modifier = imageModifier,
                                 placeholder = painterResource(id = R.drawable.placeholder_image),
-                                error= painterResource(id = R.drawable.error_image)
+                                error = painterResource(id = R.drawable.error_image)
                             )
                         }
 
-                        Row(
-                            modifier = Modifier
-                                .padding(horizontal = 12.dp, vertical = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column(
+                            modifier = Modifier.weight(1f)
                         ) {
                             Text(
                                 text = "${index + 1}. ${bookmark.title}",
-                                modifier = Modifier.weight(1f),
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 3,
+                                overflow = TextOverflow.Ellipsis
                             )
-                            IconButton(
-                                onClick = {
-                                    viewModel.delete(bookmark)
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Delete,
-                                    contentDescription = "Delete Bookmark",
-                                    tint = MaterialTheme.colorScheme.error
-                                )
+                        }
+
+                        IconButton(
+                            onClick = {
+                                viewModel.delete(bookmark)
                             }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete Bookmark",
+                                tint = MaterialTheme.colorScheme.error
+                            )
                         }
                     }
                 }
