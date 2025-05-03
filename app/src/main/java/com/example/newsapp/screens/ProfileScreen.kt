@@ -181,7 +181,7 @@ fun BookmarkList(
                                 Icon(
                                     imageVector = Icons.Filled.Delete,
                                     contentDescription = "Delete Bookmark",
-                                    tint = MaterialTheme.colorScheme.error,
+                                    tint = Color(0xFFEF5350),
                                     modifier = Modifier.size(24.dp)
                                 )
                             }

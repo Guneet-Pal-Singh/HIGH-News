@@ -81,22 +81,22 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
                     Text(
                         text = "HIGH News",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp,
+                        fontSize = 24.sp,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = "Get HIGH on information",
-                        fontSize = 12.sp,
+                        fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = "CATEGORIES",
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     letterSpacing = 1.2.sp,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
@@ -123,7 +123,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
                                 searchQuery.value = ""
                                 viewModel.fetchTopHeadlines(category.lowercase())
                             }
-                            .padding(vertical = 12.dp, horizontal = 16.dp),
+                            .padding(vertical = 12.dp, horizontal = 24.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
@@ -137,7 +137,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
                             color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                             fontFamily = FontFamily.SansSerif,
                             fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp
+                            fontSize = 16.sp
                         )
                     }
                 }
