@@ -56,3 +56,33 @@ fun NewsAppTheme(
         content = content
     )
 }
+
+@Composable
+fun NewsAppTheme_1(
+    theme:String,
+    dynamicColor: Boolean = true,
+    content: @Composable () -> Unit
+){
+    val colorScheme=when{
+        theme=="Dark"->{
+            DarkColorScheme
+        }
+        theme=="Light"->{
+            LightColorScheme
+        }
+        else->{
+            if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val context = LocalContext.current
+                if (isSystemInDarkTheme()) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            } else {
+                if (isSystemInDarkTheme()) DarkColorScheme else LightColorScheme
+            }
+        }
+    }
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content
+    )
+}

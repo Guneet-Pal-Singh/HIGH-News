@@ -1,8 +1,6 @@
 package com.example.newsapp.screens
 
-import android.content.Context
 import android.util.Log
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,7 +9,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -29,14 +29,18 @@ import coil.compose.AsyncImage
 import com.example.newsapp.R
 import com.example.newsapp.db.BookmarkEntity
 import com.google.firebase.auth.FirebaseAuth
-import androidx.core.content.edit
 
 @Composable
-fun ProfileScreen(navController: NavHostController, ViewModel: ViewModelProfileScreen) {
+fun ProfileScreen(
+    navController: NavHostController,
+    ViewModel: ViewModelProfileScreen,
+    themeViewModel: ThemeViewModel
+) {
     val auth = FirebaseAuth.getInstance()
     val userEmail = auth.currentUser?.email
     var userName by remember { mutableStateOf("") }
     val bookmarks by ViewModel.readAllData.observeAsState(emptyList())
+    val currentTheme by themeViewModel.theme.collectAsState()
 
     Column(
         modifier = Modifier
@@ -45,15 +49,40 @@ fun ProfileScreen(navController: NavHostController, ViewModel: ViewModelProfileS
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Profile Picture
-        Image(
-            painter = painterResource(id = R.drawable.profileicon),
-            contentDescription = "Profile Picture",
-            modifier = Modifier
-                .size(100.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary)
-        )
+
+        // Row with Profile Picture and Theme Toggle
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.profileicon),
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary)
+            )
+
+            IconButton(
+                onClick = { themeViewModel.toggleTheme() },
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = CircleShape
+                    )
+            ) {
+                Icon(
+                    imageVector = if (currentTheme == "Dark") Icons.Default.LightMode else Icons.Default.DarkMode,
+                    contentDescription = "Toggle Theme",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         // User Info
         Text(text = userName, style = MaterialTheme.typography.headlineMedium)
@@ -66,12 +95,12 @@ fun ProfileScreen(navController: NavHostController, ViewModel: ViewModelProfileS
             onClick = { /* Navigate to Edit Profile Screen */ },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Edit Profile" , fontSize = 18.sp)
+            Text("Edit Profile", fontSize = 18.sp)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-// Logout Button
+        // Logout Button
         Button(
             onClick = {
                 auth.signOut()
@@ -82,12 +111,8 @@ fun ProfileScreen(navController: NavHostController, ViewModel: ViewModelProfileS
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
         ) {
-            Text(
-                "Logout",
-                fontSize = 18.sp
-            )
+            Text("Logout", fontSize = 18.sp)
         }
-
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -102,14 +127,7 @@ fun ProfileScreen(navController: NavHostController, ViewModel: ViewModelProfileS
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Bookmarks List
-        BookmarkList(
-            bookmarks = bookmarks,
-            viewModel = ViewModel
-        )
-
-        // Theme Selection
-        Theme()
+        BookmarkList(bookmarks = bookmarks, viewModel = ViewModel)
     }
 }
 
@@ -193,35 +211,4 @@ fun BookmarkList(
             }
         }
     }
-}
-
-@Composable
-fun Theme(){
-    Column(modifier = Modifier.padding(5.dp)) {
-        Button(onClick = {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }) {
-            Text(text = "Light Theme")
-        }
-
-        Button(onClick = {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }) {
-            Text(text = "Dark Theme")
-        }
-
-        Button(onClick = { AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) }) {
-            Text(text = "System Default")
-        }
-    }
-}
-
-fun saveThemePreference(context: Context, mode: String) {
-    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-    prefs.edit() { putString("theme_mode", mode) }
-}
-
-fun loadThemePreference(context: Context): String {
-    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-    return prefs.getString("theme_mode", "system") ?: "system"
 }
