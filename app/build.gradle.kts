@@ -69,7 +69,8 @@ dependencies {
 
     // Room
     implementation(libs.androidx.room.ktx)
-    implementation("androidx.room:room-runtime:2.7.0") // explicitly included
+    implementation("androidx.room:room-runtime:2.7.0")
+    implementation(libs.androidx.media3.common.ktx) // explicitly included
     kapt("androidx.room:room-compiler:2.7.0")
 
     // Firebase
@@ -95,4 +96,9 @@ dependencies {
     // Debug tools
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation("com.google.accompanist:accompanist-permissions:<latest_version>")
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0") // Use the latest version
+
+
 }

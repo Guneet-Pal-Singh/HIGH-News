@@ -1,6 +1,9 @@
 package com.example.newsapp.screens
 
+import android.app.Activity
 import android.net.Uri
+import android.speech.SpeechRecognizer
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,20 +20,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.util.Log
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
+import com.example.newsapp.SpeechRecognizerHelper
 import com.example.newsapp.api.Article
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.shouldShowRationale
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -160,7 +171,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = Vi
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun SearchBar(
     searchQuery: MutableState<String>,
@@ -168,6 +179,27 @@ fun SearchBar(
     navController: NavController,
     onSearch: (String) -> Unit
 ) {
+    val context = LocalContext.current
+    val activity = context as Activity
+    val speechRecognizerHelper = remember {
+        SpeechRecognizerHelper(activity) { result ->
+            val trimmedResult = result.trim()
+            if (trimmedResult.isNotEmpty()) {
+//                Log.d("Voice Result ", "$trimmedResult")
+                searchQuery.value = trimmedResult.toString()
+                onSearch(trimmedResult.toString())
+            }
+        }
+    }
+    val permissionState = rememberPermissionState(android.Manifest.permission.RECORD_AUDIO)
+
+    // Clean up speech recognizer when composable leaves composition
+    DisposableEffect(Unit) {
+        onDispose {
+            speechRecognizerHelper.destroy()
+        }
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -182,7 +214,7 @@ fun SearchBar(
             value = searchQuery.value,
             onValueChange = {
                 searchQuery.value = it
-                if (it.length > 2) {
+                if (it.isNotBlank()) { // Search immediately for all input
                     onSearch(it)
                 }
             },
@@ -194,6 +226,39 @@ fun SearchBar(
             leadingIcon = {
                 Icon(Icons.Default.Search, contentDescription = "Search", tint = MaterialTheme.colorScheme.onSurface)
             },
+            trailingIcon = {
+                IconButton(onClick = {
+                    when {
+                        permissionState.status.isGranted -> {
+                            if (SpeechRecognizer.isRecognitionAvailable(context)) {
+                                speechRecognizerHelper.startListening()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Speech recognition not available",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                        permissionState.status.shouldShowRationale -> {
+                            Toast.makeText(
+                                context,
+                                "Microphone permission required for voice search",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                        else -> {
+                            permissionState.launchPermissionRequest()
+                        }
+                    }
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.applogo), // Use your mic icon
+                        contentDescription = "Voice Search",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            },
             colors = TextFieldDefaults.outlinedTextFieldColors()
         )
 
@@ -202,6 +267,7 @@ fun SearchBar(
         }
     }
 }
+
 
 @Composable
 fun NewsList(articles: List<Article>?, navController: NavController) {
