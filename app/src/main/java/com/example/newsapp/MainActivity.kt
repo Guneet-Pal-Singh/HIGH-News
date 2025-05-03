@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val themeViewModel = ThemeViewModel()
+        val themeViewModel = ThemeViewModel(application)
         setContent {
             val theme by themeViewModel.theme.collectAsState()
 
