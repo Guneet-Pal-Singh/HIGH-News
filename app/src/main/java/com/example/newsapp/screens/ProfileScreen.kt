@@ -3,6 +3,7 @@ package com.example.newsapp.screens
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -37,8 +38,8 @@ fun ProfileScreen(
     themeViewModel: ThemeViewModel
 ) {
     val auth = FirebaseAuth.getInstance()
-    val userEmail = auth.currentUser?.email
-    var userName by remember { mutableStateOf("") }
+    val userEmail = auth.currentUser?.email ?: "No Email"
+    var userName by remember { mutableStateOf("") } // Optional: You can fetch this from Firebase
     val bookmarks by ViewModel.readAllData.observeAsState(emptyList())
     val currentTheme by themeViewModel.theme.collectAsState()
 
@@ -46,167 +47,190 @@ fun ProfileScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 16.dp)
     ) {
-
-        // Row with Profile Picture and Theme Toggle
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.profileicon),
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary)
-            )
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
 
-            IconButton(
-                onClick = { themeViewModel.toggleTheme() },
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = CircleShape
-                    )
-            ) {
-                Icon(
-                    imageVector = if (currentTheme == "Dark") Icons.Default.LightMode else Icons.Default.DarkMode,
-                    contentDescription = "Toggle Theme",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // User Info
-        Text(text = userName, style = MaterialTheme.typography.headlineMedium)
-        Text(text = userEmail ?: "No Email", color = Color.Gray)
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Edit Profile Button
-        Button(
-            onClick = { /* Navigate to Edit Profile Screen */ },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Edit Profile", fontSize = 18.sp)
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Logout Button
-        Button(
-            onClick = {
-                auth.signOut()
-                navController.navigate("main_screen") {
-                    popUpTo("profile_screen") { inclusive = true }
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-        ) {
-            Text("Logout", fontSize = 18.sp)
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Bookmarks Header
-        Text(
-            text = "My Bookmarks",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(start = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        BookmarkList(bookmarks = bookmarks, viewModel = ViewModel)
-    }
-}
-
-@Composable
-fun BookmarkList(
-    bookmarks: List<BookmarkEntity>,
-    viewModel: ViewModelProfileScreen
-) {
-    Log.d("BookmarkList", "Bookmarks: $bookmarks")
-    if (bookmarks.isEmpty()) {
-        Text(
-            text = "No bookmarks yet.",
-            color = Color.Gray,
-            modifier = Modifier.padding(8.dp)
-        )
-    } else {
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            itemsIndexed(bookmarks) { index, bookmark ->
+                // Profile Info Card
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                    shape = RoundedCornerShape(16.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        val imageModifier = Modifier
+                    Row(
+                        modifier = Modifier
                             .fillMaxWidth()
-                            .height(180.dp)
-                            .clip(RoundedCornerShape(12.dp))
-
-                        if (bookmark.imageURL == "empty") {
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Profile Picture and Email
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.weight(1f)
+                        ) {
                             Image(
-                                painter = painterResource(id = R.drawable.placeholder_image),
-                                contentDescription = "Bookmark Image",
-                                modifier = imageModifier
+                                painter = painterResource(id = R.drawable.profileicon),
+                                contentDescription = "Profile Picture",
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary)
                             )
-                        } else {
-                            AsyncImage(
-                                model = bookmark.imageURL,
-                                contentDescription = "Bookmark Image",
-                                modifier = imageModifier,
-                                placeholder = painterResource(id = R.drawable.placeholder_image),
-                                error = painterResource(id = R.drawable.error_image)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = userEmail,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.Gray
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "${bookmark.title}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 5,
-                                overflow = TextOverflow.Clip,
-                                modifier = Modifier.weight(1f)
-                            )
+                        // Buttons and Theme Toggle
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            val buttonWidth = 130.dp
+
+                            Column {
+                                Button(
+                                    onClick = { /* Navigate to edit profile */ },
+                                    modifier = Modifier
+                                        .width(buttonWidth)
+                                        .padding(bottom = 8.dp)
+                                ) {
+                                    Text("Edit Profile", fontSize = 14.sp)
+                                }
+
+                                Button(
+                                    onClick = {
+                                        auth.signOut()
+                                        navController.navigate("main_screen") {
+                                            popUpTo("profile_screen") { inclusive = true }
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF5350)),
+                                    modifier = Modifier.width(buttonWidth)
+                                ) {
+                                    Text("Logout", fontSize = 14.sp, color = Color.White)
+                                }
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
 
                             IconButton(
-                                onClick = { viewModel.delete(bookmark) },
-                                modifier = Modifier.size(36.dp)
+                                onClick = { themeViewModel.toggleTheme() },
+                                modifier = Modifier
+                                    .padding(start = 8.dp)
+                                    .border(1.dp, Color.Gray, shape = CircleShape)
+                                    .size(50.dp)
                             ) {
                                 Icon(
-                                    imageVector = Icons.Filled.Delete,
-                                    contentDescription = "Delete Bookmark",
-                                    tint = Color(0xFFEF5350),
-                                    modifier = Modifier.size(24.dp)
+                                    imageVector = if (currentTheme == "Dark") Icons.Default.LightMode else Icons.Default.DarkMode,
+                                    contentDescription = "Toggle Theme",
+                                    tint = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
                     }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "My Bookmarks",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 4.dp)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // Bookmarks List
+            if (bookmarks.isEmpty()) {
+                item {
+                    Text(
+                        text = "No bookmarks yet.",
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            } else {
+                itemsIndexed(bookmarks) { _, bookmark ->
+                    BookmarkCard(bookmark = bookmark, viewModel = ViewModel)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun BookmarkCard(bookmark: BookmarkEntity, viewModel: ViewModelProfileScreen) {
+    Log.d("BookmarkCard", "Bookmark: $bookmark")
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            val imageModifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
+                .clip(RoundedCornerShape(12.dp))
+
+            if (bookmark.imageURL == "empty") {
+                Image(
+                    painter = painterResource(id = R.drawable.placeholder_image),
+                    contentDescription = "Bookmark Image",
+                    modifier = imageModifier
+                )
+            } else {
+                AsyncImage(
+                    model = bookmark.imageURL,
+                    contentDescription = "Bookmark Image",
+                    modifier = imageModifier,
+                    placeholder = painterResource(id = R.drawable.placeholder_image),
+                    error = painterResource(id = R.drawable.error_image)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = bookmark.title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 5,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+
+                IconButton(
+                    onClick = { viewModel.delete(bookmark) },
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "Delete Bookmark",
+                        tint = Color(0xFFEF5350),
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             }
         }
