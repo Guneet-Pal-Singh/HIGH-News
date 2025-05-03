@@ -10,17 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.core.graphics.drawable.DrawableCompat.applyTheme
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.newsapp.api.Article
 import com.example.newsapp.screens.*
 import com.example.newsapp.ui.theme.NewsAppTheme
-import androidx.compose.runtime.getValue
-import com.example.newsapp.ui.theme.NewsAppTheme_1
 import com.google.gson.Gson
 
 class MainActivity : ComponentActivity() {
@@ -33,7 +30,8 @@ class MainActivity : ComponentActivity() {
 
             Log.d("MainActivity", "Current theme: $theme")
 
-            NewsAppTheme_1(theme=theme) {
+            // Use the unified theme composable
+            NewsAppTheme(theme = theme) {
                 val navController = rememberNavController()
                 val viewModel = ViewModelProfileScreen(application = this.application)
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -46,11 +44,13 @@ class MainActivity : ComponentActivity() {
                         composable("main_screen") { LoginScreen(navController) }
                         composable("home_screen") { HomeScreen(navController) }
                         composable("register_screen") { RegisterScreen(navController) }
-                        composable("profile_screen") { ProfileScreen(navController,viewModel,themeViewModel) }
+                        composable("profile_screen") {
+                            ProfileScreen(navController, viewModel, themeViewModel)
+                        }
                         composable("news_detail/{article}") { backStackEntry ->
                             val json = backStackEntry.arguments?.getString("article")
                             val article = Gson().fromJson(json, Article::class.java)
-                            NewsDetailScreen(navController, article,viewModel)
+                            NewsDetailScreen(navController, article, viewModel)
                         }
                     }
                 }

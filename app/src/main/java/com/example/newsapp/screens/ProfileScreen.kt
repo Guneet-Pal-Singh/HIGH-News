@@ -39,7 +39,6 @@ fun ProfileScreen(
 ) {
     val auth = FirebaseAuth.getInstance()
     val userEmail = auth.currentUser?.email ?: "No Email"
-    var userName by remember { mutableStateOf("") } // Optional: You can fetch this from Firebase
     val bookmarks by ViewModel.readAllData.observeAsState(emptyList())
     val currentTheme by themeViewModel.theme.collectAsState()
 
@@ -56,7 +55,7 @@ fun ProfileScreen(
             item {
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Profile Info Card
+                // Profile Info Card (distinct color)
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -85,10 +84,9 @@ fun ProfileScreen(
                             Text(
                                 text = userEmail,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
-
                         Spacer(modifier = Modifier.width(8.dp))
 
                         // Buttons and Theme Toggle
@@ -112,10 +110,9 @@ fun ProfileScreen(
                                             popUpTo("profile_screen") { inclusive = true }
                                         }
                                     },
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF5350)),
                                     modifier = Modifier.width(buttonWidth)
                                 ) {
-                                    Text("Logout", fontSize = 14.sp, color = Color.White)
+                                    Text("Logout", fontSize = 14.sp)
                                 }
                             }
                             Spacer(modifier = Modifier.width(8.dp))
@@ -177,9 +174,7 @@ fun BookmarkCard(bookmark: BookmarkEntity, viewModel: ViewModelProfileScreen) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        ),
+
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp)
     ) {

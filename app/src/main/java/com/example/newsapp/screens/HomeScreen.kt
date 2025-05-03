@@ -240,6 +240,9 @@ fun ArticleCard(article: Article, navController: NavController) {
                 }
             ),
         shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.inverseOnSurface
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {

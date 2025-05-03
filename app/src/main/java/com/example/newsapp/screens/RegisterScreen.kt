@@ -228,10 +228,4 @@ fun RegisterScreen(navController: NavController) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewRegisterScreen() {
-    NewsAppTheme {
-        RegisterScreen(navController = rememberNavController())
-    }
-}
+
