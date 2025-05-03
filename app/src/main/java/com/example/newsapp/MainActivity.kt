@@ -27,6 +27,7 @@ class MainActivity : ComponentActivity() {
         val themeViewModel = ThemeViewModel(application)
         setContent {
             val theme by themeViewModel.theme.collectAsState()
+            themeViewModel.registerPowerSaverReceiver()
 
             Log.d("MainActivity", "Current theme: $theme")
 
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
             NewsAppTheme(theme = theme) {
                 val navController = rememberNavController()
                 val viewModel = ViewModelProfileScreen(application = this.application)
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     NavHost(
                         navController = navController,
