@@ -2,12 +2,10 @@ package com.example.newsapp.screens
 
 import android.app.Activity
 import android.net.Uri
-import android.os.Build
 import android.speech.SpeechRecognizer
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.DefaultTab.AlbumsTab.value
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.*
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,6 +16,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.media3.common.util.Log
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
@@ -45,20 +44,19 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.shouldShowRationale
 
-
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
     val searchQuery = remember { mutableStateOf("") }
-    val newsResponse by viewModel.newsResponse.observeAsState()
+    val newsResponse by viewModel.newsResponseByLocation.observeAsState()
+    val newsResponseGlobal by viewModel.newsResponseGlobal.observeAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
 
-    var needLocation=false
-
-    val categories = listOf("General", "Business", "Health", "Entertainment", "Science", "Sports", "Technology","Regional")
+    val categories = listOf("General", "Business", "Health", "Entertainment", "Science", "Sports", "Technology")
     var selectedCategory by remember { mutableStateOf(categories.first()) }
+    var isUsingGlobalNews by rememberSaveable { mutableStateOf(false) }
+
 
     val categoryIcons = mapOf(
         "General" to Icons.Default.Public,
@@ -67,8 +65,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
         "Entertainment" to Icons.Default.Movie,
         "Science" to Icons.Default.Science,
         "Sports" to Icons.Default.SportsSoccer,
-        "Technology" to Icons.Default.Computer,
-        "Regional" to Icons.Default.Flag
+        "Technology" to Icons.Default.Computer
     )
 
     ModalNavigationDrawer(
@@ -139,11 +136,10 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
                                 selectedCategory = category
                                 coroutineScope.launch { drawerState.close() }
                                 searchQuery.value = ""
-                                viewModel.fetchTopHeadlines(category.lowercase())
-                                if (category == "Regional") {
-                                    viewModel.fetchArticlesByLocation()
-                                }else{
-                                    viewModel.fetchTopHeadlines(category)
+                                if (isUsingGlobalNews) {
+                                    viewModel.fetchTopHeadlinesGlobal(category.lowercase())
+                                } else {
+                                    viewModel.fetchTopHeadlines(category.lowercase())
                                 }
                             }
                             .padding(vertical = 12.dp, horizontal = 24.dp),
@@ -176,23 +172,34 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
                 searchQuery = searchQuery,
                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                 navController = navController,
-                onSearch = {
-                    query -> viewModel.searchArticles(query)
+                isUsingGlobalNews = isUsingGlobalNews,
+                onSearch = { query ->
+                    if (isUsingGlobalNews) {
+                        viewModel.searchArticlesGlobal(query)
+                    } else {
+                        viewModel.searchArticles(query)
+                    }
                 }
             )
-
-            NewsList(newsResponse?.articles, navController)
+            NewsList(
+                articles = if (isUsingGlobalNews) newsResponseGlobal?.articles else newsResponse?.articles,
+                navController = navController,
+                onShowGlobalNews = {
+                    isUsingGlobalNews = true
+                    viewModel.fetchTopHeadlinesGlobal(selectedCategory.lowercase())
+                }
+            )
         }
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun SearchBar(
     searchQuery: MutableState<String>,
     onMenuClick: () -> Unit,
     navController: NavController,
+    isUsingGlobalNews: Boolean,
     onSearch: (String) -> Unit
 ) {
     val context = LocalContext.current
@@ -201,14 +208,13 @@ fun SearchBar(
         SpeechRecognizerHelper(activity) { result ->
             val trimmedResult = result.trim()
             if (trimmedResult.isNotEmpty()) {
-               searchQuery.value = trimmedResult
+                searchQuery.value = trimmedResult
                 onSearch(trimmedResult)
             }
         }
     }
     val permissionState = rememberPermissionState(android.Manifest.permission.RECORD_AUDIO)
 
-    // Clean up speech recognizer when composable leaves composition
     DisposableEffect(Unit) {
         onDispose {
             speechRecognizerHelper.destroy()
@@ -229,7 +235,7 @@ fun SearchBar(
             value = searchQuery.value,
             onValueChange = {
                 searchQuery.value = it
-                if (it.isNotBlank()) { // Search immediately for all input
+                if (it.isNotBlank()) {
                     onSearch(it)
                 }
             },
@@ -248,30 +254,24 @@ fun SearchBar(
                             if (SpeechRecognizer.isRecognitionAvailable(context)) {
                                 speechRecognizerHelper.startListening()
                             } else {
-                                Toast.makeText(
-                                    context,
-                                    "Speech recognition not available",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast.makeText(context, "Speech recognition not available", Toast.LENGTH_SHORT).show()
                             }
                         }
                         permissionState.status.shouldShowRationale -> {
-                            Toast.makeText(
-                                context,
-                                "Microphone permission required for voice search",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Toast.makeText(context, "Microphone permission required for voice search", Toast.LENGTH_LONG).show()
                         }
                         else -> {
                             permissionState.launchPermissionRequest()
                         }
                     }
                 }) {
+
                     Icon(
                         imageVector = Icons.Default.Mic,
                         contentDescription = "Voice Search",
                         tint = MaterialTheme.colorScheme.primary
                     )
+
                 }
             },
             colors = TextFieldDefaults.outlinedTextFieldColors()
@@ -283,9 +283,12 @@ fun SearchBar(
     }
 }
 
-
 @Composable
-fun NewsList(articles: List<Article>?, navController: NavController) {
+fun NewsList(
+    articles: List<Article>?,
+    navController: NavController,
+    onShowGlobalNews: (() -> Unit)? = null
+) {
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         articles?.filter { !it.urlToImage.isNullOrEmpty() }?.let { filteredArticles ->
             if (filteredArticles.isNotEmpty()) {
@@ -294,13 +297,21 @@ fun NewsList(articles: List<Article>?, navController: NavController) {
                 }
             } else {
                 item {
-                    Text(
-                        "No articles available",
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
-                        textAlign = TextAlign.Center
-                    )
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("No articles available", textAlign = TextAlign.Center)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = { onShowGlobalNews?.invoke() },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                        ) {
+                            Text("Show Global News")
+                        }
+                    }
                 }
             }
         }

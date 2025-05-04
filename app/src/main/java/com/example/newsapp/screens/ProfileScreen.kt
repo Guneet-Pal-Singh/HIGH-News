@@ -55,7 +55,6 @@ fun ProfileScreen(
             item {
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Profile Info Card (distinct color)
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -73,7 +72,7 @@ fun ProfileScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.profileicon),
+                                painter = painterResource(id = R.drawable.psyduck),
                                 contentDescription = "Profile Picture",
                                 modifier = Modifier
                                     .size(100.dp)
