@@ -1,3 +1,4 @@
+
 package com.example.newsapp
 
 import android.Manifest
@@ -10,7 +11,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -25,26 +25,24 @@ import com.example.newsapp.api.Article
 import com.example.newsapp.screens.*
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.google.android.gms.location.*
-import com.google.android.gms.tasks.Task
 import com.google.gson.Gson
 import java.util.*
-
-// Add this import at the top:
-import com.example.newsapp.screens.ViewModelHomeScreenFactory
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationPermissionLauncher: ActivityResultLauncher<Array<String>>
-
-    private var homeScreenViewModel: ViewModelHomeScreen? = null // Now nullable
+    private var homeScreenViewModel: ViewModelHomeScreen? = null
+    private lateinit var themeViewModel: ThemeViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Initialize themeViewModel once
+        themeViewModel = ThemeViewModel(application)
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        val themeViewModel = ThemeViewModel(application)
 
         locationPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
@@ -62,9 +60,13 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Request permission or get location
-        val fineGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val coarseGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val fineGranted = ContextCompat.checkSelfPermission(
+            this, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val coarseGranted = ContextCompat.checkSelfPermission(
+            this, Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
 
         if (!fineGranted && !coarseGranted) {
             locationPermissionLauncher.launch(
@@ -85,7 +87,6 @@ class MainActivity : ComponentActivity() {
         homeScreenViewModel = ViewModelProvider(this, factory).get(ViewModelHomeScreen::class.java)
 
         setContent {
-            val themeViewModel = ThemeViewModel(application)
             val theme by themeViewModel.theme.collectAsState()
             val navController = rememberNavController()
             val viewModel = ViewModelProfileScreen(application)
@@ -132,6 +133,7 @@ class MainActivity : ComponentActivity() {
                     try {
                         val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
                         val countryCode = addresses?.firstOrNull()?.countryCode?.lowercase(Locale.ROOT) ?: "us"
+                        Log.e("Location", "${countryCode}")
                         callback(countryCode)
                     } catch (e: Exception) {
                         Log.e("Location", "Geocoder failed", e)
@@ -147,3 +149,4 @@ class MainActivity : ComponentActivity() {
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
     }
 }
+

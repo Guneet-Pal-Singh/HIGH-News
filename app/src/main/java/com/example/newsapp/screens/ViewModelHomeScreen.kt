@@ -14,9 +14,13 @@ class ViewModelHomeScreen(private val location: String) : ViewModel() {
     private val _newsResponseByLocation = MutableLiveData<NewsResponse?>()
     val newsResponseByLocation: LiveData<NewsResponse?> = _newsResponseByLocation
 
+    private val _newsResponseGlobal = MutableLiveData<NewsResponse?>()
+    val newsResponseGlobal: LiveData<NewsResponse?> = _newsResponseGlobal
+
     init {
         fetchTopHeadlines("general")
         fetchArticlesByLocation()
+        fetchGlobalArticles()
     }
 
     fun fetchTopHeadlines(category: String) {
@@ -24,10 +28,10 @@ class ViewModelHomeScreen(private val location: String) : ViewModel() {
             try {
                 val response = NewsRepository.getTopHeadlines(category)
                 _newsResponse.value = response
-                Log.d("ViewModelHomeScreen", "Fetched: ${response?.status}")
+                Log.d("ViewModelHomeScreen", "Fetched category: ${response?.status}")
             } catch (e: Exception) {
                 _newsResponse.value = null
-                Log.e("ViewModelHomeScreen", "Error: ${e.localizedMessage}")
+                Log.e("ViewModelHomeScreen", "Error fetching category: ${e.localizedMessage}")
             }
         }
     }
@@ -51,10 +55,34 @@ class ViewModelHomeScreen(private val location: String) : ViewModel() {
                 val response = NewsRepository.getNewsHeadlinesByLocation(location)
                 _newsResponseByLocation.value = response
                 Log.d("ViewModelHomeScreen", "Fetched by location: ${response?.status}")
-                Log.d("ViewModelHomeScreen", "response: ${response?.articles}")
             } catch (e: Exception) {
                 _newsResponseByLocation.value = null
-                Log.e("ViewModelHomeScreen", "Error fetching by location: ${e.localizedMessage}")
+                Log.e("ViewModelHomeScreen", "Error by location: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun fetchGlobalArticles() {
+        viewModelScope.launch {
+            try {
+                val response = NewsRepository.getNewsHeadlinesByLocation("us")
+                _newsResponseGlobal.value = response
+                Log.d("ViewModelHomeScreen", "Fetched global: ${response?.status}")
+            } catch (e: Exception) {
+                _newsResponseGlobal.value = null
+                Log.e("ViewModelHomeScreen", "Global fetch error: ${e.localizedMessage}")
+            }
+        }
+    }
+    fun fetchTopHeadlinesGlobal(category: String) {
+        viewModelScope.launch {
+            try {
+                val response = NewsRepository.getTopHeadlines(category)
+                _newsResponseGlobal.value = response
+                Log.d("ViewModelHomeScreen", "Fetched category: ${response?.status}")
+            } catch (e: Exception) {
+                _newsResponseGlobal.value = null
+                Log.e("ViewModelHomeScreen", "Error fetching category: ${e.localizedMessage}")
             }
         }
     }

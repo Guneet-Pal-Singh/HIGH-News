@@ -55,7 +55,6 @@ fun ProfileScreen(
             item {
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Profile Info Card (distinct color)
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
