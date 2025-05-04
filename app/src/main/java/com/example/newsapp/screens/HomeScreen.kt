@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,7 +55,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
 
     val categories = listOf("General", "Business", "Health", "Entertainment", "Science", "Sports", "Technology")
     var selectedCategory by remember { mutableStateOf(categories.first()) }
-    var isUsingGlobalNews by remember { mutableStateOf(false) }
+    var isUsingGlobalNews by rememberSaveable { mutableStateOf(false) }
 
 
     val categoryIcons = mapOf(

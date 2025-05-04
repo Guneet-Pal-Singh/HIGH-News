@@ -3,6 +3,6 @@ package com.example.newsapp.constants
 class Constants {
     companion object {
         const val BASE_URL = "https://newsapi.org"
-        const val API_KEY= "21c3fbf8cd4d45d9b113edd8c2adff93"
+        const val API_KEY= "656caedb9ba6478b912059109f7a404d"
     }
 }
