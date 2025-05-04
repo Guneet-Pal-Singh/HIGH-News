@@ -2,6 +2,7 @@ package com.example.newsapp
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -24,6 +25,7 @@ import com.example.newsapp.screens.*
 import com.example.newsapp.ui.theme.NewsAppTheme
 import com.google.android.gms.location.*
 import com.google.gson.Gson
+import java.util.*
 
 class MainActivity : ComponentActivity() {
 
@@ -36,7 +38,7 @@ class MainActivity : ComponentActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         val themeViewModel = ThemeViewModel(application)
 
-        // ✅ Register permission launcher BEFORE setContent
+        // Register permission launcher
         locationPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
@@ -55,7 +57,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val viewModel = ViewModelProfileScreen(application)
 
-            // ✅ Request permissions only when UI is composed
+            // Request permissions
             LaunchedEffect(Unit) {
                 val fineGranted = ContextCompat.checkSelfPermission(
                     this@MainActivity, Manifest.permission.ACCESS_FINE_LOCATION
@@ -103,16 +105,38 @@ class MainActivity : ComponentActivity() {
 
     @RequiresPermission(anyOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun getLastLocation() {
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location ->
+        val locationRequest = LocationRequest.create().apply {
+            priority = Priority.PRIORITY_HIGH_ACCURACY
+            interval = 1000
+            numUpdates = 1
+        }
+
+        val locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                val location = locationResult.lastLocation
                 if (location != null) {
-                    Log.d("Location", "Lat: ${location.latitude}, Lng: ${location.longitude}")
-                } else {
-                    Log.d("Location", "Location not available")
+                    val lat = location.latitude
+                    val lng = location.longitude
+                    Log.d("Location", "Lat: $lat, Lng: $lng")
+
+                    // Get country using Geocoder
+                    val geocoder = Geocoder(this@MainActivity, Locale.getDefault())
+                    try {
+                        val addresses = geocoder.getFromLocation(lat, lng, 1)
+                        if (!addresses.isNullOrEmpty()) {
+                            val country = addresses[0].countryName
+                            Log.d("Location", "Country: $country")
+                        } else {
+                            Log.d("Location", "No address found")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("Location", "Geocoder failed", e)
+                    }
                 }
+                fusedLocationClient.removeLocationUpdates(this)
             }
-            .addOnFailureListener {
-                Log.e("Location", "Failed to get location", it)
-            }
+        }
+
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
     }
 }
