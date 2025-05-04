@@ -72,7 +72,7 @@ fun ProfileScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.profileicon),
+                                painter = painterResource(id = R.drawable.psyduck),
                                 contentDescription = "Profile Picture",
                                 modifier = Modifier
                                     .size(100.dp)
