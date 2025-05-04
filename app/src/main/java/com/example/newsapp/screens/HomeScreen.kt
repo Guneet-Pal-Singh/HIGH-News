@@ -171,9 +171,13 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
                 searchQuery = searchQuery,
                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                 navController = navController,
+                isUsingGlobalNews = isUsingGlobalNews,
                 onSearch = { query ->
-                    isUsingGlobalNews = false
-                    viewModel.searchArticles(query)
+                    if (isUsingGlobalNews) {
+                        viewModel.searchArticlesGlobal(query)
+                    } else {
+                        viewModel.searchArticles(query)
+                    }
                 }
             )
             NewsList(
@@ -194,6 +198,7 @@ fun SearchBar(
     searchQuery: MutableState<String>,
     onMenuClick: () -> Unit,
     navController: NavController,
+    isUsingGlobalNews: Boolean,
     onSearch: (String) -> Unit
 ) {
     val context = LocalContext.current

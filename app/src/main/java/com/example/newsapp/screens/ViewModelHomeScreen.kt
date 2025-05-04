@@ -48,6 +48,18 @@ class ViewModelHomeScreen(private val location: String) : ViewModel() {
             }
         }
     }
+    fun searchArticlesGlobal(query: String) {
+        viewModelScope.launch {
+            try {
+                val response = NewsRepository.searchArticles(query)
+                _newsResponseGlobal.value = response
+                Log.d("ViewModelHomeScreen", "Search fetched: ${response?.status}")
+            } catch (e: Exception) {
+                _newsResponseGlobal.value = null
+                Log.e("ViewModelHomeScreen", "Search error: ${e.localizedMessage}")
+            }
+        }
+    }
 
     fun fetchArticlesByLocation() {
         viewModelScope.launch {
