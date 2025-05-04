@@ -70,7 +70,8 @@ dependencies {
     // Room
     implementation(libs.androidx.room.ktx)
     implementation("androidx.room:room-runtime:2.7.0")
-    implementation(libs.androidx.media3.common.ktx) // explicitly included
+    implementation(libs.androidx.media3.common.ktx)
+    implementation(libs.play.services.location) // explicitly included
     kapt("androidx.room:room-compiler:2.7.0")
 
     // Firebase
