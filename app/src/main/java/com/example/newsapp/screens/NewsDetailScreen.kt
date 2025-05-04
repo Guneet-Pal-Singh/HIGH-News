@@ -129,8 +129,8 @@ fun NewsContent(
     }
 
     val customLines = listOf(
-        "To bookmark the article, click on the 'Bookmark' button below on the left",
-        "To read full article, click on the 'Read More' button below on the right"
+        "To bookmark the article, click on the 'Bookmark' button on the bottom left  of the screen",
+        "To read full article, click on the 'Read More' button on the bottom right of the screen"
     )
 
     val ttsSequence = remember(cleanedTitle, descriptionParagraphs, contentParagraphs) {
