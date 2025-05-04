@@ -4,6 +4,10 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.example.newsapp.NewsRepository
 import com.example.newsapp.api.NewsResponse
+import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.TranslatorOptions
 import kotlinx.coroutines.launch
 
 class ViewModelHomeScreen(private val location: String) : ViewModel() {

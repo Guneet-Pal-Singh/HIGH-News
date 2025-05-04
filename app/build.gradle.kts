@@ -86,6 +86,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation("androidx.compose.material:material-icons-extended:1.5.0")
     implementation ("androidx.appcompat:appcompat:1.6.1")
+    implementation ("com.google.mlkit:translate:17.0.3")
 
     // Testing
     testImplementation(libs.junit)

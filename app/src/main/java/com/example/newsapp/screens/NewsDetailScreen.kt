@@ -1,9 +1,11 @@
 package com.example.newsapp.screens
 
+import TranslationViewModel
 import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.newsapp.api.Article
@@ -44,6 +47,8 @@ fun NewsDetailScreen(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    val translateViewModel = viewModel<TranslationViewModel>()
 
     LaunchedEffect(Unit) {
         viewModelProfileScreen.toastMessage.collectLatest { message ->
@@ -71,7 +76,8 @@ fun NewsDetailScreen(
         NewsContent(
             article = article,
             onReadMoreClick = { showWebView = true },
-            onBookmarkClick = { addBookmark() }
+            onBookmarkClick = { addBookmark() },
+            translateViewModel = translateViewModel
         )
     }
 }
@@ -104,23 +110,39 @@ fun formatIndianTime(dateString: String): String {
 fun NewsContent(
     article: Article,
     onReadMoreClick: () -> Unit,
-    onBookmarkClick: () -> Unit
+    onBookmarkClick: () -> Unit,
+    translateViewModel: TranslationViewModel
 ) {
     val cleanedTitle = article.title.removeSuffix(" - ${article.source.name}")
     val context = LocalContext.current
+    var translate by remember { mutableStateOf(false) }
+    val translatedTexts by translateViewModel.translatedText.collectAsState()
+
+    val defaultTexts = listOf(cleanedTitle, article.description ?: "", article.content ?: "Content unavailable")
+
+    val currentTexts = if (translate) {
+        if (translatedTexts.size >= 3) translatedTexts else defaultTexts
+    } else {
+        defaultTexts
+    }
+
+    val title = currentTexts[0]
+    val description = currentTexts[1]
+    val content = currentTexts[2]
+
 
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
     var isSpeaking by remember { mutableStateOf(false) }
     var currentChunk by remember { mutableStateOf(0) }
 
-    val descriptionParagraphs = (article.description ?: "")
+    val descriptionParagraphs = (description)
         .split(Regex("\n+")).filter { it.isNotBlank() }
 
-    val contentParagraphs = (article.content ?: "Content unavailable")
+    val contentParagraphs = (content?: "Content unavailable")
         .replace(Regex("\\[\\+\\d+ chars]"), "")
         .split(Regex("\n+")).filter { it.isNotBlank() }
 
-    val allParagraphs = listOf(cleanedTitle) + descriptionParagraphs + contentParagraphs
+    val allParagraphs = currentTexts
     val ttsChunks = remember(allParagraphs) {
         val maxLen = 3500
         allParagraphs.flatMap { paragraph ->
@@ -133,9 +155,9 @@ fun NewsContent(
         "To read full article, click on the 'Read More' button on the bottom right of the screen"
     )
 
-    val ttsSequence = remember(cleanedTitle, descriptionParagraphs, contentParagraphs) {
+    val ttsSequence = remember(title, description, content) {
         val seq = mutableListOf<Pair<String?, Long?>>()
-        seq.add(cleanedTitle to null)
+        seq.add(title to null)
         seq.add(null to 1000L)
         descriptionParagraphs.forEach { seq.add(it to null) }
         contentParagraphs.forEach { seq.add(it to null) }
@@ -186,7 +208,7 @@ fun NewsContent(
                 .padding(bottom = 100.dp) // Leave space for fixed buttons
         ) {
             Text(
-                text = cleanedTitle,
+                text = title,
                 style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Serif),
                 textAlign = TextAlign.Start,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -213,14 +235,14 @@ fun NewsContent(
             }
 
             Text(
-                text = article.description ?: "",
+                text = description,
                 style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = FontFamily.Serif),
                 textAlign = TextAlign.Start,
                 modifier = Modifier.padding(bottom = 10.dp)
             )
 
             Text(
-                text = article.content?.replace(Regex("\\[\\+\\d+ chars]"), "") + "\n\nTo read the full article, click on the 'Read More' button below.",
+                text = content.replace(Regex("\\[\\+\\d+ chars]"), "") + "\n\nTo read the full article, click on the 'Read More' button below.",
                 style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = FontFamily.Serif),
                 textAlign = TextAlign.Start,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -235,30 +257,48 @@ fun NewsContent(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
-                onClick = {
-                    if (isSpeaking) {
-                        tts?.stop()
-                        isSpeaking = false
-                        currentChunk = 0
-                    } else {
-                        currentChunk = 0
-                        speakNextChunk(tts, ttsSequence, currentChunk)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Icon(
-                    imageVector = if (isSpeaking) Icons.Filled.VolumeOff else Icons.Filled.VolumeUp,
-                    contentDescription = "Read Aloud",
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(if (isSpeaking) "Stop" else "Read Aloud")
-            }
+            Row{
+                Button(
+                    onClick = {
+                        if (isSpeaking) {
+                            tts?.stop()
+                            isSpeaking = false
+                            currentChunk = 0
+                        } else {
+                            currentChunk = 0
+                            speakNextChunk(tts, ttsSequence, currentChunk)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(0.5f),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Icon(
+                        imageVector = if (isSpeaking) Icons.Filled.VolumeOff else Icons.Filled.VolumeUp,
+                        contentDescription = "Read Aloud",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(if (isSpeaking) "Stop" else "Read Aloud")
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Button(
+                    onClick = {
+                        translate=!translate
+
+                        translateViewModel.translateTitle(
+                            translate = translate,
+                            sourceText = defaultTexts
+                        )
+
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Translate")
+                }
+            }
 
             Row(modifier = Modifier.fillMaxWidth()) {
                 Button(

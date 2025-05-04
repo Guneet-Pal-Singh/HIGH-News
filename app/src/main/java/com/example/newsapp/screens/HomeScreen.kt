@@ -1,5 +1,7 @@
 package com.example.newsapp.screens
 
+import TranslationViewModel
+import android.Manifest
 import android.app.Activity
 import android.net.Uri
 import android.speech.SpeechRecognizer
@@ -57,6 +59,8 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
     var selectedCategory by remember { mutableStateOf(categories.first()) }
     var isUsingGlobalNews by rememberSaveable { mutableStateOf(false) }
 
+    var translateText by remember { mutableStateOf(false) }
+    val translateViewModel = viewModel<TranslationViewModel>()
 
     val categoryIcons = mapOf(
         "General" to Icons.Default.Public,
@@ -160,6 +164,19 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.weight(1f))
+                Button(
+                    onClick = {
+                        translateText = !translateText
+                    }
+                ) {
+                    Text(
+                        text = "Translate",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                }
             }
         }
     ) {
@@ -187,7 +204,9 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
                 onShowGlobalNews = {
                     isUsingGlobalNews = true
                     viewModel.fetchTopHeadlinesGlobal(selectedCategory.lowercase())
-                }
+                },
+                translationViewModel = translateViewModel,
+                translateText = translateText
             )
         }
     }
@@ -213,7 +232,7 @@ fun SearchBar(
             }
         }
     }
-    val permissionState = rememberPermissionState(android.Manifest.permission.RECORD_AUDIO)
+    val permissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
 
     DisposableEffect(Unit) {
         onDispose {
@@ -265,13 +284,11 @@ fun SearchBar(
                         }
                     }
                 }) {
-
                     Icon(
                         imageVector = Icons.Default.Mic,
                         contentDescription = "Voice Search",
                         tint = MaterialTheme.colorScheme.primary
                     )
-
                 }
             },
             colors = TextFieldDefaults.outlinedTextFieldColors()
@@ -287,13 +304,28 @@ fun SearchBar(
 fun NewsList(
     articles: List<Article>?,
     navController: NavController,
-    onShowGlobalNews: (() -> Unit)? = null
+    onShowGlobalNews: (() -> Unit)? = null,
+    translationViewModel: TranslationViewModel,
+    translateText: Boolean
 ) {
+    val titles = articles?.map { it.title } ?: emptyList()
+
+    LaunchedEffect(translateText, titles) {
+        if (translateText) {
+            translationViewModel.translateTitle(true, titles)
+        }
+    }
+
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         articles?.filter { !it.urlToImage.isNullOrEmpty() }?.let { filteredArticles ->
             if (filteredArticles.isNotEmpty()) {
                 items(filteredArticles) { article ->
-                    ArticleCard(article, navController)
+                    val index = filteredArticles.indexOf(article)
+                    val translatedTitle = if (translateText)
+                        translationViewModel.translatedText.value.getOrNull(index) ?: article.title
+                    else article.title
+
+                    ArticleCard(article, navController, translationViewModel, translatedTitle)
                 }
             } else {
                 item {
@@ -320,7 +352,7 @@ fun NewsList(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ArticleCard(article: Article, navController: NavController) {
+fun ArticleCard(article: Article, navController: NavController, translationViewModel: TranslationViewModel, title: String) {
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -348,7 +380,7 @@ fun ArticleCard(article: Article, navController: NavController) {
             )
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
-                    text = article.title,
+                    text = title,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurface
