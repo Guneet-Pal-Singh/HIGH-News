@@ -129,7 +129,7 @@ fun NewsContent(
     }
 
     val customLines = listOf(
-        "To bookmark the article, click on the 'Bookmark' button on the bottom left  of the screen",
+        "To bookmark the article, click on the 'Bookmark' button on the bottom left of the screen",
         "To read full article, click on the 'Read More' button on the bottom right of the screen"
     )
 
@@ -183,7 +183,7 @@ fun NewsContent(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
-                .padding(bottom = 100.dp) // Leave space for fixed buttons
+                .padding(bottom = 100.dp)
         ) {
             Text(
                 text = cleanedTitle,
@@ -227,62 +227,68 @@ fun NewsContent(
             )
         }
 
-        // Fixed Bottom Buttons
-        Column(
+        // Bottom Button Section with Background
+        Surface(
+            tonalElevation = 4.dp,
+            color = MaterialTheme.colorScheme.background,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
-                onClick = {
-                    if (isSpeaking) {
-                        tts?.stop()
-                        isSpeaking = false
-                        currentChunk = 0
-                    } else {
-                        currentChunk = 0
-                        speakNextChunk(tts, ttsSequence, currentChunk)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            Column(
+                modifier = Modifier
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    imageVector = if (isSpeaking) Icons.Filled.VolumeOff else Icons.Filled.VolumeUp,
-                    contentDescription = "Read Aloud",
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(if (isSpeaking) "Stop" else "Read Aloud")
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(modifier = Modifier.fillMaxWidth()) {
                 Button(
-                    onClick = onBookmarkClick,
-                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        if (isSpeaking) {
+                            tts?.stop()
+                            isSpeaking = false
+                            currentChunk = 0
+                        } else {
+                            currentChunk = 0
+                            speakNextChunk(tts, ttsSequence, currentChunk)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Bookmark,
-                        contentDescription = "Bookmark",
+                        imageVector = if (isSpeaking) Icons.Filled.VolumeOff else Icons.Filled.VolumeUp,
+                        contentDescription = "Read Aloud",
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Bookmark")
+                    Text(if (isSpeaking) "Stop" else "Read Aloud")
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                Button(
-                    onClick = onReadMoreClick,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Text("Read More")
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Button(
+                        onClick = onBookmarkClick,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Bookmark,
+                            contentDescription = "Bookmark",
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Bookmark")
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Button(
+                        onClick = onReadMoreClick,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Text("Read More")
+                    }
                 }
             }
         }
