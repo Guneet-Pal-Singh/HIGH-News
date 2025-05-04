@@ -29,6 +29,10 @@ import com.example.newsapp.api.Article
 import com.example.newsapp.db.BookmarkEntity
 import kotlinx.coroutines.flow.collectLatest
 import java.util.*
+import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
+import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.VolumeUp
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -90,6 +94,88 @@ fun formatIndianTime(dateString: String): String {
 @Composable
 fun NewsContent(article: Article, onReadMoreClick: () -> Unit, onBookmarkClick: () -> Unit) {
     val cleanedTitle = article.title.removeSuffix(" - ${article.source.name}")
+
+    val context = LocalContext.current
+    // --- TTS State and Logic ---
+    var tts by remember { mutableStateOf<TextToSpeech?>(null) }
+    var isSpeaking by remember { mutableStateOf(false) }
+    var currentChunk by remember { mutableStateOf(0) }
+
+    // Prepare paragraphs: title, description (split by newline), and content
+    val descriptionParagraphs = (article.description ?: "")
+        .split(Regex("\n+"))
+        .filter { it.isNotBlank() }
+    val contentParagraphs = (article.content ?: "Content unavailable")
+        .replace(Regex("\\[\\+\\d+ chars]"), "")
+        .split(Regex("\n+"))
+        .filter { it.isNotBlank() }
+
+    val allParagraphs = listOf(cleanedTitle) + descriptionParagraphs + contentParagraphs
+
+    // Chunk paragraphs for TTS limit
+    val ttsChunks = remember(allParagraphs) {
+        val maxLen = 3500
+        allParagraphs.flatMap { paragraph ->
+            if (paragraph.length > maxLen) paragraph.chunked(maxLen)
+            else listOf(paragraph)
+        }
+    }
+
+    val customLines = listOf(
+        "To bookmark the article, click on the 'Bookmark' button below on the left",
+        "To read full article, click on the 'Read More' button below on the right"
+    )
+
+    val ttsSequence = remember(cleanedTitle, descriptionParagraphs, contentParagraphs) {
+        val seq = mutableListOf<Pair<String?, Long?>>()
+        seq.add(cleanedTitle to null) // Title
+        seq.add(null to 1000L)        // 1-second pause (1000 ms)
+        descriptionParagraphs.forEach { seq.add(it to null) }
+        contentParagraphs.forEach { seq.add(it to null) }
+        seq.add(null to 500L)        // 0.5-second pause (500 ms)
+        customLines.forEach { seq.add(it to null) }
+        seq
+    }
+
+    fun speakNextChunk(
+        tts: TextToSpeech?,
+        sequence: List<Pair<String?, Long?>>,
+        index: Int
+    ) {
+        val (text, pause) = sequence[index]
+        if (pause != null) {
+            tts?.playSilentUtterance(pause, TextToSpeech.QUEUE_FLUSH, "PAUSE_$index")
+        } else if (text != null) {
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "CHUNK_$index")
+        }
+    }
+
+    DisposableEffect(ttsSequence) {
+        tts = TextToSpeech(context) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                tts?.language = Locale.getDefault()
+            }
+        }
+        tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            override fun onStart(utteranceId: String?) { isSpeaking = true }
+            override fun onDone(utteranceId: String?) {
+                if (currentChunk < ttsSequence.size - 1) {
+                    currentChunk++
+                    speakNextChunk(tts, ttsSequence, currentChunk)
+                } else {
+                    isSpeaking = false
+                    currentChunk = 0
+                }
+            }
+            override fun onError(utteranceId: String?) { isSpeaking = false }
+        })
+        onDispose {
+            tts?.stop()
+            tts?.shutdown()
+        }
+    }
+
+
 
     Column(
         modifier = Modifier
@@ -178,6 +264,40 @@ fun NewsContent(article: Article, onReadMoreClick: () -> Unit, onBookmarkClick: 
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     "Bookmark",
+                    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                )
+            }
+
+            Spacer(Modifier.width(8.dp))
+
+            // --- Read Aloud Button ---
+            Button(
+                onClick = {
+                    if (!isSpeaking) {
+                        currentChunk = 0
+                        tts?.speak(
+                            ttsChunks[0],
+                            TextToSpeech.QUEUE_FLUSH,
+                            null,
+                            "CHUNK_0"
+                        )
+                    } else {
+                        tts?.stop()
+                        isSpeaking = false
+                        currentChunk = 0
+                    }
+                },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Icon(
+                    imageVector = if (isSpeaking) Icons.Filled.VolumeOff else Icons.Filled.VolumeUp,
+                    contentDescription = "Read Aloud",
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    if (isSpeaking) "Stop" else "Read Aloud",
                     style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 )
             }
