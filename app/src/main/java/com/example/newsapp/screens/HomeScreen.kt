@@ -45,7 +45,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen = ViewModelHomeScreen()) {
+fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
     val searchQuery = remember { mutableStateOf("") }
     val newsResponse by viewModel.newsResponse.observeAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)

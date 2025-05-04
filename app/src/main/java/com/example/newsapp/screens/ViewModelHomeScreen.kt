@@ -1,36 +1,30 @@
 package com.example.newsapp.screens
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.newsapp.NewsRepository
 import com.example.newsapp.api.NewsResponse
 import kotlinx.coroutines.launch
 
-class ViewModelHomeScreen : ViewModel() {
+class ViewModelHomeScreen(private val location: String) : ViewModel() {
+
     private val _newsResponse = MutableLiveData<NewsResponse?>()
     val newsResponse: LiveData<NewsResponse?> = _newsResponse
 
+    private val _newsResponseByLocation = MutableLiveData<NewsResponse?>()
+    val newsResponseByLocation: LiveData<NewsResponse?> = _newsResponseByLocation
+
     init {
-        fetchTopHeadlines("general") // Default category
+        fetchTopHeadlines("general")
+        fetchArticlesByLocation()
     }
 
-    // Fetch articles based on the selected category
     fun fetchTopHeadlines(category: String) {
         viewModelScope.launch {
-            Log.d("ViewModelHomeScreen", "Fetching $category news from repository...")
-
             try {
-                val response: NewsResponse? = NewsRepository.getTopHeadlines(category)
+                val response = NewsRepository.getTopHeadlines(category)
                 _newsResponse.value = response
-
-                if (response != null) {
-                    Log.d("ViewModelHomeScreen", "Response received: ${response.status}")
-                } else {
-                    Log.e("ViewModelHomeScreen", "Response is null")
-                }
+                Log.d("ViewModelHomeScreen", "Fetched: ${response?.status}")
             } catch (e: Exception) {
                 _newsResponse.value = null
                 Log.e("ViewModelHomeScreen", "Error: ${e.localizedMessage}")
@@ -38,23 +32,28 @@ class ViewModelHomeScreen : ViewModel() {
         }
     }
 
-    // Fetch articles based on the search query
     fun searchArticles(query: String) {
         viewModelScope.launch {
-            Log.d("ViewModelHomeScreen", "Searching news with query: $query")
-
             try {
-                val response: NewsResponse? = NewsRepository.searchArticles(query)
+                val response = NewsRepository.searchArticles(query)
                 _newsResponse.value = response
-
-                if (response != null) {
-                    Log.d("ViewModelHomeScreen", "Search response received: ${response.status}")
-                } else {
-                    Log.e("ViewModelHomeScreen", "Search response is null")
-                }
+                Log.d("ViewModelHomeScreen", "Search fetched: ${response?.status}")
             } catch (e: Exception) {
                 _newsResponse.value = null
-                Log.e("ViewModelHomeScreen", "Error: ${e.localizedMessage}")
+                Log.e("ViewModelHomeScreen", "Search error: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun fetchArticlesByLocation() {
+        viewModelScope.launch {
+            try {
+                val response = NewsRepository.getTopHeadlines(location)
+                _newsResponseByLocation.value = response
+                Log.d("ViewModelHomeScreen", "Fetched by location: ${response?.status}")
+            } catch (e: Exception) {
+                _newsResponseByLocation.value = null
+                Log.e("ViewModelHomeScreen", "Error fetching by location: ${e.localizedMessage}")
             }
         }
     }
