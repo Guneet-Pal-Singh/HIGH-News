@@ -47,11 +47,13 @@ import com.google.accompanist.permissions.shouldShowRationale
 @Composable
 fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
     val searchQuery = remember { mutableStateOf("") }
-    val newsResponse by viewModel.newsResponseByLocation.observeAsState()
+    val newsResponse by viewModel.newsResponse.observeAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
 
-    val categories = listOf("General", "Business", "Health", "Entertainment", "Science", "Sports", "Technology")
+    var needLocation=false
+
+    val categories = listOf("General", "Business", "Health", "Entertainment", "Science", "Sports", "Technology","Regional")
     var selectedCategory by remember { mutableStateOf(categories.first()) }
 
     val categoryIcons = mapOf(
@@ -61,7 +63,8 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
         "Entertainment" to Icons.Default.Movie,
         "Science" to Icons.Default.Science,
         "Sports" to Icons.Default.SportsSoccer,
-        "Technology" to Icons.Default.Computer
+        "Technology" to Icons.Default.Computer,
+        "Regional" to Icons.Default.Flag
     )
 
     ModalNavigationDrawer(
@@ -133,6 +136,11 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
                                 coroutineScope.launch { drawerState.close() }
                                 searchQuery.value = ""
                                 viewModel.fetchTopHeadlines(category.lowercase())
+                                if (category == "Regional") {
+                                    viewModel.fetchArticlesByLocation()
+                                }else{
+                                    viewModel.fetchTopHeadlines(category)
+                                }
                             }
                             .padding(vertical = 12.dp, horizontal = 24.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -166,6 +174,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
                 navController = navController,
                 onSearch = { query -> viewModel.searchArticles(query) }
             )
+
             NewsList(newsResponse?.articles, navController)
         }
     }

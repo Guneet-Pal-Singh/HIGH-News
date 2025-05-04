@@ -87,6 +87,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val themeViewModel = ThemeViewModel(application)
             val theme by themeViewModel.theme.collectAsState()
+            themeViewModel.registerPowerSaverReceiver()
             val navController = rememberNavController()
             val viewModel = ViewModelProfileScreen(application)
 
@@ -131,7 +132,11 @@ class MainActivity : ComponentActivity() {
                     val geocoder = Geocoder(this@MainActivity, Locale.getDefault())
                     try {
                         val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                        val countryCode = addresses?.firstOrNull()?.countryCode?.lowercase(Locale.ROOT) ?: "us"
+                        Log.d("Location", "Addresses: $addresses")
+                        var countryCode = addresses?.firstOrNull()?.countryCode?.lowercase(Locale.ROOT) ?: "us"
+                        if (countryCode=="uk"){
+                            countryCode="gb"
+                        }
                         callback(countryCode)
                     } catch (e: Exception) {
                         Log.e("Location", "Geocoder failed", e)

@@ -11,9 +11,6 @@ class ViewModelHomeScreen(private val location: String) : ViewModel() {
     private val _newsResponse = MutableLiveData<NewsResponse?>()
     val newsResponse: LiveData<NewsResponse?> = _newsResponse
 
-    private val _newsResponseByLocation = MutableLiveData<NewsResponse?>()
-    val newsResponseByLocation: LiveData<NewsResponse?> = _newsResponseByLocation
-
     init {
         fetchTopHeadlines("general")
         fetchArticlesByLocation()
@@ -49,11 +46,12 @@ class ViewModelHomeScreen(private val location: String) : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = NewsRepository.getNewsHeadlinesByLocation(location)
-                _newsResponseByLocation.value = response
+                _newsResponse.value = response
+                Log.d("ViewModelHomeScreen", "Fetched by location: $location")
                 Log.d("ViewModelHomeScreen", "Fetched by location: ${response?.status}")
                 Log.d("ViewModelHomeScreen", "response: ${response?.articles}")
             } catch (e: Exception) {
-                _newsResponseByLocation.value = null
+                _newsResponse.value = null
                 Log.e("ViewModelHomeScreen", "Error fetching by location: ${e.localizedMessage}")
             }
         }
