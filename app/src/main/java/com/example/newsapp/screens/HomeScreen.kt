@@ -47,7 +47,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 @Composable
 fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
     val searchQuery = remember { mutableStateOf("") }
-    val newsResponse by viewModel.newsResponse.observeAsState()
+    val newsResponse by viewModel.newsResponseByLocation.observeAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
 

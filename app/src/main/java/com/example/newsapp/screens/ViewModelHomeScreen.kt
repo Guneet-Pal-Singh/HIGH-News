@@ -48,9 +48,10 @@ class ViewModelHomeScreen(private val location: String) : ViewModel() {
     fun fetchArticlesByLocation() {
         viewModelScope.launch {
             try {
-                val response = NewsRepository.getTopHeadlines(location)
+                val response = NewsRepository.getNewsHeadlinesByLocation(location)
                 _newsResponseByLocation.value = response
                 Log.d("ViewModelHomeScreen", "Fetched by location: ${response?.status}")
+                Log.d("ViewModelHomeScreen", "response: ${response?.articles}")
             } catch (e: Exception) {
                 _newsResponseByLocation.value = null
                 Log.e("ViewModelHomeScreen", "Error fetching by location: ${e.localizedMessage}")
