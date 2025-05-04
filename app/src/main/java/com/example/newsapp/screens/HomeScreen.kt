@@ -2,8 +2,11 @@ package com.example.newsapp.screens
 
 import android.app.Activity
 import android.net.Uri
+import android.os.Build
 import android.speech.SpeechRecognizer
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.DefaultTab.AlbumsTab.value
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -43,6 +46,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.shouldShowRationale
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
@@ -172,7 +176,9 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
                 searchQuery = searchQuery,
                 onMenuClick = { coroutineScope.launch { drawerState.open() } },
                 navController = navController,
-                onSearch = { query -> viewModel.searchArticles(query) }
+                onSearch = {
+                    query -> viewModel.searchArticles(query)
+                }
             )
 
             NewsList(newsResponse?.articles, navController)
@@ -180,6 +186,7 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun SearchBar(
@@ -194,9 +201,8 @@ fun SearchBar(
         SpeechRecognizerHelper(activity) { result ->
             val trimmedResult = result.trim()
             if (trimmedResult.isNotEmpty()) {
-//                Log.d("Voice Result ", "$trimmedResult")
-                searchQuery.value = trimmedResult.toString()
-                onSearch(trimmedResult.toString())
+               searchQuery.value = trimmedResult
+                onSearch(trimmedResult)
             }
         }
     }
@@ -262,7 +268,7 @@ fun SearchBar(
                     }
                 }) {
                     Icon(
-                        painter = painterResource(id = R.drawable.applogo), // Use your mic icon
+                        imageVector = Icons.Default.Mic,
                         contentDescription = "Voice Search",
                         tint = MaterialTheme.colorScheme.primary
                     )
