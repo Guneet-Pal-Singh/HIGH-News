@@ -6,6 +6,8 @@ import android.icu.text.SimpleDateFormat
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -82,11 +84,13 @@ fun NewsDetailScreen(
     }
 }
 
+@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun WebViewScreen(url: String) {
     AndroidView(
         factory = { context ->
-            android.webkit.WebView(context).apply {
+            WebView(context).apply {
+                webViewClient = WebViewClient() // Ensures navigation stays in the WebView
                 settings.javaScriptEnabled = true
                 loadUrl(url)
             }

@@ -44,6 +44,7 @@ class MainActivity : ComponentActivity() {
 
         // Initialize themeViewModel once
         themeViewModel = ThemeViewModel(application)
+        themeViewModel.registerPowerSaverReceiver()
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 

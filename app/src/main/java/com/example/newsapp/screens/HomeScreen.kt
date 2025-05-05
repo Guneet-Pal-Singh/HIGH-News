@@ -167,14 +167,21 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
 
                 Spacer(modifier = Modifier.weight(1f))
                 Button(
-                    onClick = {
-                        translateText = !translateText
-                    }
+                    onClick = { translateText = !translateText },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
                 ) {
                     Text(
                         text = "Translate",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(vertical = 4.dp)
                     )
                 }
             }
