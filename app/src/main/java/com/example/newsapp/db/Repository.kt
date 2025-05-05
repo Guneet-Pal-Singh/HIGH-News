@@ -24,4 +24,8 @@ class Repository (private val userDao: UserDao) {
     suspend fun isBookmarkExists(url: String): Boolean {
         return userDao.getBookmarkByUrl(url) != null
     }
+
+    suspend fun getBookmarkById(id: Int): BookmarkEntity? {
+        return userDao.getBookmarkById(id)
+    }
 }

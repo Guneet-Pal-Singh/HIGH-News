@@ -4,6 +4,7 @@ package com.example.newsapp
 import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -18,9 +19,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.newsapp.api.Article
 import com.example.newsapp.screens.*
 import com.example.newsapp.ui.theme.NewsAppTheme
@@ -112,6 +115,29 @@ class MainActivity : ComponentActivity() {
                             val article = Gson().fromJson(json, Article::class.java)
                             NewsDetailScreen(navController, article, viewModel)
                         }
+
+                        composable(
+                            route = "articleDetail/{title}/{imageUrl}/{description}/{url}",
+                            arguments = listOf(
+                                navArgument("title") { type = NavType.StringType },
+                                navArgument("imageUrl") { type = NavType.StringType },
+                                navArgument("description") { type = NavType.StringType },
+                                navArgument("url") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            val title = backStackEntry.arguments?.getString("title") ?: ""
+                            val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
+                            val description = backStackEntry.arguments?.getString("description") ?: ""
+                            val url = backStackEntry.arguments?.getString("url") ?: ""
+                            ArticleDetailScreen(
+                                title = title,
+                                imageUrl = imageUrl,
+                                description = description,
+                                url = url,
+                                navController = navController
+                            )
+                        }
+
                     }
                 }
             }

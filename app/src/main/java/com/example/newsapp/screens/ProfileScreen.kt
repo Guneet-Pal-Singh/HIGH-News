@@ -1,9 +1,11 @@
 package com.example.newsapp.screens
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -157,22 +159,36 @@ fun ProfileScreen(
                     )
                 }
             } else {
+                // In ProfileScreen composable
                 itemsIndexed(bookmarks) { _, bookmark ->
-                    BookmarkCard(bookmark = bookmark, viewModel = ViewModel)
+                    BookmarkCard(
+                        bookmark = bookmark,
+                        viewModel = ViewModel,
+                        navController = navController // Pass navController here
+                    )
                 }
+
             }
         }
     }
 }
 
 @Composable
-fun BookmarkCard(bookmark: BookmarkEntity, viewModel: ViewModelProfileScreen) {
+fun BookmarkCard(bookmark: BookmarkEntity, viewModel: ViewModelProfileScreen, navController: NavHostController) {
     Log.d("BookmarkCard", "Bookmark: $bookmark")
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp),
+            .padding(vertical = 6.dp)
+            .clickable {
+                val encodedTitle = Uri.encode(bookmark.title)
+                val encodedImage = Uri.encode(bookmark.imageURL)
+                val encodedDesc = Uri.encode(bookmark.description)
+                val encodedUrl = Uri.encode(bookmark.url)
+                navController.navigate("articleDetail/$encodedTitle/$encodedImage/$encodedDesc/$encodedUrl")
+            }
+        ,
 
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp)
