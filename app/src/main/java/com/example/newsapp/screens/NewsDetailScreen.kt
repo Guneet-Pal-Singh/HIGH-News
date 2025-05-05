@@ -265,6 +265,7 @@ fun NewsContent(
                             isSpeaking = false
                             currentChunk = 0
                         } else {
+                            tts?.language = if (translate) Locale("hi", "IN") else Locale("en", "IN")
                             currentChunk = 0
                             speakNextChunk(tts, ttsSequence, currentChunk)
                         }
@@ -291,6 +292,12 @@ fun NewsContent(
                             translate = translate,
                             sourceText = defaultTexts
                         )
+                        // Set TTS language according to translation state
+                        tts?.language = if (translate) {
+                            Locale("hi", "IN") // Hindi
+                        } else {
+                            Locale("en", "IN") // English
+                        }
 
                     },
                     modifier = Modifier.fillMaxWidth(),
