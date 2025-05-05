@@ -1,5 +1,6 @@
 package com.example.newsapp.screens
 
+import ConnectivityObserver
 import TranslationViewModel
 import android.Manifest
 import android.app.Activity
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -61,6 +63,27 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
 
     var translateText by remember { mutableStateOf(false) }
     val translateViewModel = viewModel<TranslationViewModel>()
+
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val connectivityObserver = remember { ConnectivityObserver(context) }
+    val isConnected by connectivityObserver.isConnected.collectAsState()
+
+    DisposableEffect(lifecycleOwner) {
+        onDispose {
+            connectivityObserver.unregister(context)
+        }
+    }
+
+    LaunchedEffect(isConnected) {
+        if (isConnected) {
+            if (isUsingGlobalNews) {
+                viewModel.fetchTopHeadlinesGlobal(selectedCategory.lowercase())
+            } else {
+                viewModel.fetchTopHeadlines(selectedCategory.lowercase())
+            }
+        }
+    }
 
     val categoryIcons = mapOf(
         "General" to Icons.Default.Public,
@@ -205,16 +228,32 @@ fun HomeScreen(navController: NavController, viewModel: ViewModelHomeScreen) {
                     }
                 }
             )
-            NewsList(
-                articles = if (isUsingGlobalNews) newsResponseGlobal?.articles else newsResponse?.articles,
-                navController = navController,
-                onShowGlobalNews = {
-                    isUsingGlobalNews = true
-                    viewModel.fetchTopHeadlinesGlobal(selectedCategory.lowercase())
-                },
-                translationViewModel = translateViewModel,
-                translateText = translateText
-            )
+            if (!isConnected) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text("No internet connection", color = MaterialTheme.colorScheme.error, fontSize = 18.sp)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { navController.navigate("profile_screen") }) {
+                        Text("Go to Profile")
+                    }
+                }
+            }else{
+                NewsList(
+                    articles = if (isUsingGlobalNews) newsResponseGlobal?.articles else newsResponse?.articles,
+                    navController = navController,
+                    onShowGlobalNews = {
+                        isUsingGlobalNews = true
+                        viewModel.fetchTopHeadlinesGlobal(selectedCategory.lowercase())
+                    },
+                    translationViewModel = translateViewModel,
+                    translateText = translateText
+                )
+            }
         }
     }
 }
