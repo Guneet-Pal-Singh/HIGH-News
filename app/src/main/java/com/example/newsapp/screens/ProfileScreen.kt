@@ -96,12 +96,12 @@ fun ProfileScreen(
 
                             Column {
                                 Button(
-                                    onClick = { /* Navigate to edit profile */ },
+                                    onClick = { navController.navigate("home_screen")  },
                                     modifier = Modifier
                                         .width(buttonWidth)
                                         .padding(bottom = 8.dp)
                                 ) {
-                                    Text("Edit Profile", fontSize = 14.sp)
+                                    Text("Go To Home", fontSize = 14.sp)
                                 }
 
                                 Button(

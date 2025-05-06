@@ -1,10 +1,10 @@
-
 package com.example.newsapp
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Geocoder
-import android.net.Uri
+import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -55,8 +55,12 @@ class MainActivity : ComponentActivity() {
                     permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
 
             if (granted) {
-                getLastLocation { countryCode ->
-                    setupUIWithViewModel(countryCode)
+                if (!isLocationEnabled()) {
+                    setupUIWithViewModel("us")
+                } else {
+                    getLastLocation { countryCode ->
+                        setupUIWithViewModel(countryCode)
+                    }
                 }
             } else {
                 Log.w("Location", "Permission denied")
@@ -79,11 +83,20 @@ class MainActivity : ComponentActivity() {
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 )
             )
+        } else if (!isLocationEnabled()) {
+            // Location services are OFF
+            setupUIWithViewModel("us")
         } else {
             getLastLocation { countryCode ->
                 setupUIWithViewModel(countryCode)
             }
         }
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
     private fun setupUIWithViewModel(countryCode: String) {
@@ -116,7 +129,6 @@ class MainActivity : ComponentActivity() {
                             val article = Gson().fromJson(json, Article::class.java)
                             NewsDetailScreen(navController, article, viewModel)
                         }
-
                         composable(
                             route = "articleDetail/{title}/{imageUrl}/{description}/{url}",
                             arguments = listOf(
@@ -138,7 +150,6 @@ class MainActivity : ComponentActivity() {
                                 navController = navController
                             )
                         }
-
                     }
                 }
             }
@@ -160,7 +171,7 @@ class MainActivity : ComponentActivity() {
                     try {
                         val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
                         val countryCode = addresses?.firstOrNull()?.countryCode?.lowercase(Locale.ROOT) ?: "us"
-                        Log.e("Location", "${countryCode}")
+                        Log.e("Location", "$countryCode")
                         callback(countryCode)
                     } catch (e: Exception) {
                         Log.e("Location", "Geocoder failed", e)
@@ -176,4 +187,3 @@ class MainActivity : ComponentActivity() {
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
     }
 }
-

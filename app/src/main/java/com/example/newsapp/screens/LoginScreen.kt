@@ -170,25 +170,6 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Button(
-                onClick = { /* Google login logic here */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(horizontal = 16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = surfaceColor),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.elevatedButtonElevation(4.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.google),
-                    contentDescription = "Google Icon",
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Login with Google", color = textColor)
-            }
-
             Spacer(modifier = Modifier.height(16.dp))
 
             TextButton(onClick = { navController.navigate("home_screen") }) {
