@@ -35,12 +35,13 @@
 ## 🚀 Features
 
 ### 📰 News Feed
-- Latest headlines from categories like **Sports**, **Tech**, **Politics**, and more
+- Latest headlines from categories like **Business**, **Health**, **Sports**, **Technology** ,and more
 - Personalized news selection based on your preferences
 
 ### 🔍 Search
 - Search bar to find news by keyword
-
+- **Voice search support** for hands-free and faster searches
+  
 ### 🌐 Translation
 - Translate articles into **Hindi** with one tap
 
@@ -110,18 +111,6 @@ const val NEWS_API_KEY = "your_api_key_here"
 - Idhant Arora (2022220)  
 - Guneet Pal Singh (2022190)  
 - Harsh Hingorani (2022197)
-
----
-
-## 🤝 Contributions
-
-Pull requests are welcome! If you find a bug or have an idea for a feature, feel free to open an issue or submit a PR.
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
 
 ---
 
