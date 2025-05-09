@@ -7,7 +7,7 @@
 ## 🖼️ Screenshots
 
 <p align="center">
-  <img src="https://github.com/Guneet-Pal-Singh/HIGH-NEWS/NewsAppScreenShots/LogIn.jpg" width="200"/>
+  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/NewsAppScreenShots/LogIn.jpg" width="200"/>
   &nbsp;
   <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/login_screen.jpg" width="200"/>
   &nbsp;
