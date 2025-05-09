@@ -12,6 +12,26 @@
 
 ---
 
+## 🖼️ Screenshots
+
+<p align="center">
+  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/signup_screen.jpg" width="200"/>
+  &nbsp;
+  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/login_screen.jpg" width="200"/>
+  &nbsp;
+  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/news_screen.jpg" width="200"/>
+</p>
+
+<p align="center">
+  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/translation.jpg" width="200"/>
+  &nbsp;
+  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/profile.jpg" width="200"/>
+  &nbsp;
+  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/search.jpg" width="200"/>
+</p>
+
+---
+
 ## 🚀 Features
 
 ### 📰 News Feed
@@ -36,26 +56,6 @@
 
 ### ⚙️ Profile
 - Edit user details and view bookmarks
-
----
-
-## 🖼️ Screenshots
-
-<p align="center">
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/signup_screen.jpg" width="200"/>
-  &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/login_screen.jpg" width="200"/>
-  &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/news_screen.jpg" width="200"/>
-</p>
-
-<p align="center">
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/translation.jpg" width="200"/>
-  &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/profile.jpg" width="200"/>
-  &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/search.jpg" width="200"/>
-</p>
 
 ---
 
