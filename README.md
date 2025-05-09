@@ -12,33 +12,6 @@
 
 ---
 
-## 🚀 Features
-
-### 📰 News Feed
-- Latest headlines from categories like **Sports**, **Tech**, **Politics**, and more
-- Personalized news selection based on your preferences
-
-### 🔍 Search
-- Search bar to find news by keyword
-
-### 🌐 Translation
-- Translate articles into **Hindi** with one tap
-
-### 🌗 Theme Support
-- **Light** and **Dark** mode switch
-
-### 🔖 Bookmarking
-- Save favorite articles to read later
-
-### 👤 Authentication
-- **Sign-Up** and **Login** using email/password
-- Secure session management
-
-### ⚙️ Profile
-- Edit user details and view bookmarks
-
----
-
 ## 🖼️ Screenshots
 
 <p align="center">
@@ -56,6 +29,34 @@
   &nbsp;
   <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/search.jpg" width="200"/>
 </p>
+
+---
+
+## 🚀 Features
+
+### 📰 News Feed
+- Latest headlines from categories like **Business**, **Health**, **Sports**, **Technology** ,and more
+- Personalized news selection based on your preferences
+
+### 🔍 Search
+- Search bar to find news by keyword
+- **Voice search support** for hands-free and faster searches
+  
+### 🌐 Translation
+- Translate articles into **Hindi** with one tap
+
+### 🌗 Theme Support
+- **Light** and **Dark** mode switch
+
+### 🔖 Bookmarking
+- Save favorite articles to read later
+
+### 👤 Authentication
+- **Sign-Up** and **Login** using email/password
+- Secure session management
+
+### ⚙️ Profile
+- Edit user details and view bookmarks
 
 ---
 
@@ -106,22 +107,10 @@ const val NEWS_API_KEY = "your_api_key_here"
 
 ## 👥 Team Members
 
-- Harsh Rawat (2022202)  
-- Guneet Pal Singh (2022190)  
+- Harsh Rawat (2022202)
 - Idhant Arora (2022220)  
+- Guneet Pal Singh (2022190)  
 - Harsh Hingorani (2022197)
-
----
-
-## 🤝 Contributions
-
-Pull requests are welcome! If you find a bug or have an idea for a feature, feel free to open an issue or submit a PR.
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
 
 ---
 
