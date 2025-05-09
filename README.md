@@ -6,25 +6,20 @@
 
 ## 🖼️ Screenshots
 
-<p align="center">
-  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/LogIn.jpg" width="200"/>
-  &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/SignUp.jpg" width="200"/>
-  &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/HomeScreen.jpg" width="200"/>
-  &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/NewsDetailScreen.jpg" width="200"/>
-</p>
-
-<p align="center">
-  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/SideBar.jpg" width="200"/>
-  &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/SearchBar.jpg" width="200"/>
-  &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/HindiLanguage.jpg" width="200"/>
-  &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/ProfileScreen.jpg" width="200"/>
-</p>
+<table align="center">
+  <tr>
+    <td align="center"><img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/LogIn.jpg" width="200"/></td>
+    <td align="center"><img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/SignUp.jpg" width="200"/></td>
+    <td align="center"><img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/HomeScreen.jpg" width="200"/></td>
+    <td align="center"><img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/NewsDetailScreen.jpg" width="200"/></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/SideBar.jpg" width="200"/></td>
+    <td align="center"><img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/SearchBar.jpg" width="200"/></td>
+    <td align="center"><img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/HindiLanguage.jpg" width="200"/></td>
+    <td align="center"><img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/ProfileScreen.jpg" width="200"/></td>
+  </tr>
+</table>
 
 ---
 
