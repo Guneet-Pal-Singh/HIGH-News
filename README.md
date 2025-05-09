@@ -1,5 +1,3 @@
----
-
 # 📱 HighNews — Get High on Information
 
 **HighNews** is a sleek, fast, and user-friendly news app inspired by **Inshorts**, developed in **Android Studio** using **Kotlin** and **Jetpack Compose**. Stay updated with short news summaries, search by topic, and personalize your feed with real-time category-specific updates.
