@@ -106,9 +106,9 @@ const val NEWS_API_KEY = "your_api_key_here"
 
 ## 👥 Team Members
 
-- Harsh Rawat (2022202)  
-- Guneet Pal Singh (2022190)  
+- Harsh Rawat (2022202)
 - Idhant Arora (2022220)  
+- Guneet Pal Singh (2022190)  
 - Harsh Hingorani (2022197)
 
 ---
