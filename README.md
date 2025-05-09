@@ -7,19 +7,23 @@
 ## 🖼️ Screenshots
 
 <p align="center">
-  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/NewsAppScreenShots/LogIn.jpg" width="200"/>
+  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/LogIn.jpg" width="200"/>
   &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/login_screen.jpg" width="200"/>
+  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/SignUp.jpg" width="200"/>
   &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/news_screen.jpg" width="200"/>
+  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/HomeScreen.jpg" width="200"/>
+  &nbsp;
+  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/NewsDetailScreen.jpg" width="200"/>
 </p>
 
 <p align="center">
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/translation.jpg" width="200"/>
+  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/SideBar.jpg" width="200"/>
   &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/profile.jpg" width="200"/>
+  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/SearchBar.jpg" width="200"/>
   &nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/search.jpg" width="200"/>
+  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/HindiLanguage.jpg" width="200"/>
+  &nbsp;
+  <img src="https://github.com/Guneet-Pal-Singh/HIGH-News/blob/master/NewsAppScreenShots/ProfileScreen.jpg" width="200"/>
 </p>
 
 ---
