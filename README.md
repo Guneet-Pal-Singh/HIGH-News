@@ -114,4 +114,4 @@ const val NEWS_API_KEY = "your_api_key_here"
 
 ---
 
-> ✨ Get High on News. Stay Informed. Stay Ahead.
+> ✨ Get High on Information. Stay Informed. Stay Ahead.
