@@ -1,11 +1,3 @@
-<p align="center">
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/logo.png" height="125"/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/text_highnews.png" height="125"/>
-</p>
-
----
-
 # 📱 HighNews — Get High on Information
 
 **HighNews** is a sleek, fast, and user-friendly news app inspired by **Inshorts**, developed in **Android Studio** using **Kotlin** and **Jetpack Compose**. Stay updated with short news summaries, search by topic, and personalize your feed with real-time category-specific updates.
@@ -114,4 +106,4 @@ const val NEWS_API_KEY = "your_api_key_here"
 
 ---
 
-> ✨ Get High on News. Stay Informed. Stay Ahead.
+> ✨ Get High on Information. Stay Informed. Stay Ahead.
