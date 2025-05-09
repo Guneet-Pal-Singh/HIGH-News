@@ -1,9 +1,3 @@
-<p align="center">
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/logo.png" height="125"/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/Guneet-Pal-Singh/HighNewsApp/raw/main/assets/text_highnews.png" height="125"/>
-</p>
-
 ---
 
 # 📱 HighNews — Get High on Information
