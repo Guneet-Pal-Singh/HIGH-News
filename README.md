@@ -72,7 +72,7 @@
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/YourUsername/HighNewsApp.git
+git clone https://github.com/Guneet-Pal-Singh/HIGH-News
 ```
 
 ### Open in Android Studio
